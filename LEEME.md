@@ -1,4 +1,24 @@
-# 📰 ETG DEEPBRIEF v3.2 — El Periódico del Trading en Vivo
+# 📰 ETG DEEPBRIEF v3.3 — El Periódico del Trading en Vivo
+
+Repo: https://github.com/neurysrl1998-arch/etg-deepbrief
+
+## 🔄 Actualizaciones y uso en otra PC
+
+**En la PC donde ya lo tienes:** ⚙️ → 🔄 Actualizaciones → "Buscar actualización".
+Si hay una nueva, botón "⬇️ Actualizar ahora" — descarga el nuevo .exe, se reinicia solo. Al abrir la app también te avisa si hay versión nueva.
+
+**En otra PC (sin instalar nada):**
+1. Ve a https://github.com/neurysrl1998-arch/etg-deepbrief/releases
+2. Descarga **ETG-DeepBrief.exe** de la última versión y ábrelo. Listo — no requiere Python.
+3. Las siguientes actualizaciones llegan solas desde ⚙️.
+
+**Publicar una nueva versión (para ti, el desarrollador):**
+1. Sube el número en `deepbrief_server.py` (`APP_VERSION`) y en `version.json`.
+2. `git add -A && git commit -m "vX.Y.Z" && git push`
+3. Recompila el .exe y publica el release:
+   `gh release create vX.Y.Z "dist/ETG-DeepBrief.exe" --title "ETG DeepBrief vX.Y.Z" --notes "..."`
+   (copia primero `dist/ETG DeepBrief.exe` a `dist/ETG-DeepBrief.exe`)
+   Todas las PC con la app lo detectarán y podrán actualizarse.
 
 ## 🆕 Novedades v3.2 — "Analista IA"
 
