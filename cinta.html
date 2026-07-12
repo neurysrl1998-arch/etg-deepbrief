@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>ETG CINTA</title>
+<style>
+:root{--bg:#0a0a08;--panel:#14110a;--line:#2a2415;--gold:#d4af37;--gold2:#f0d067;--ivory:#f2ead8;--dim:#9a8f77;
+  --red:#ff4545;--orange:#ff9f2e;--green:#2ecc71}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ivory);font:13px/1.3 'Segoe UI',system-ui,sans-serif;overflow:hidden;height:100vh;
+  display:flex;flex-direction:column}
+#row1{display:flex;align-items:center;gap:14px;padding:7px 14px;border-bottom:1px solid var(--line)}
+#logo{font-family:Georgia,serif;font-weight:bold;font-size:16px;color:var(--gold);letter-spacing:1px;white-space:nowrap}
+#clock{font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums;font-size:15px}
+#sess{font-size:11.5px;font-weight:700;white-space:nowrap}
+#vix{font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:5px;white-space:nowrap}
+#quotes{display:flex;gap:8px;margin-left:auto;overflow:hidden}
+.q{display:flex;gap:7px;align-items:baseline;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 10px;white-space:nowrap}
+.q .n{font-size:10px;color:var(--dim);font-weight:700}
+.q .p{font-weight:700;font-variant-numeric:tabular-nums;font-size:13px}
+.q .c{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+.up{color:var(--green)}.dn{color:var(--red)}
+#row2{display:flex;align-items:center;height:30px;background:#050504;overflow:hidden}
+#lbl{background:var(--red);color:#fff;font-weight:800;font-size:10px;letter-spacing:1px;padding:0 10px;height:100%;display:flex;align-items:center;flex:none}
+#tick{display:inline-block;padding-left:100%;animation:t 80s linear infinite;font-size:12.5px;white-space:nowrap}
+#tick b{color:var(--gold2)} #tick .s{color:var(--gold);margin:0 12px}
+@keyframes t{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+#crit{display:none;position:fixed;inset:0;background:linear-gradient(90deg,#4a0606,#7a0d0d);z-index:5;
+  align-items:center;padding:0 18px;font-weight:800;font-size:14px;animation:fl 1s infinite;color:#fff;gap:10px}
+@keyframes fl{50%{filter:brightness(1.35)}}
+#crit .x{margin-left:auto;cursor:pointer;font-size:17px;opacity:.8}
+</style>
+</head>
+<body>
+<div id="row1">
+  <span id="logo">⚡ ETG</span>
+  <span id="clock">--:--:--</span>
+  <span id="sess">—</span>
+  <span id="vix">VXN —</span>
+  <div id="quotes"></div>
+</div>
+<div id="row2"><div id="lbl">ÚLTIMA HORA</div><div style="overflow:hidden;flex:1"><div id="tick">Conectando con el motor ETG…</div></div></div>
+<div id="crit"><span>🚨</span><span id="critxt"></span><span class="x" onclick="this.parentNode.style.display='none';critMuted=Date.now()">✕</span></div>
+<script>
+const $=s=>document.querySelector(s);let critMuted=0;
+function fmt(n){return String(n).padStart(2,'0')}
+function tickClock(){const n=new Date(new Date().toLocaleString('en-US',{timeZone:'America/New_York',hour12:false}));
+  $('#clock').textContent=fmt(n.getHours())+':'+fmt(n.getMinutes())+':'+fmt(n.getSeconds());
+  const dow=n.getDay(),m=n.getHours()*60+n.getMinutes();let s,c;
+  if(dow===6||(dow===0&&m<1080)||(dow===5&&m>=1020)){s='🌙 CERRADO';c='var(--dim)'}
+  else if(m>=570&&m<960&&dow>=1&&dow<=5){s='🟢 NY ABIERTO';c='var(--green)'}
+  else if(m>=240&&m<570&&dow>=1&&dow<=5){s='🟡 PRE-MARKET';c='var(--orange)'}
+  else{s='🔵 GLOBEX';c='#6fa8ff'}
+  $('#sess').textContent=s;$('#sess').style.color=c}
+setInterval(tickClock,1000);tickClock();
+function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
+async function quotes(){try{const q=await(await fetch('/api/quotes')).json();
+  const main=['NQ','ES','GC','CL','BTC','DXY'];
+  $('#quotes').innerHTML=q.filter(x=>main.includes(x.sym)).map(x=>{const up=x.pct>=0;
+    return`<div class="q"><span class="n">${x.sym}</span><span class="p">${x.price.toLocaleString('en-US',{maximumFractionDigits:x.price>=1000?0:2})}</span><span class="c ${up?'up':'dn'}">${up?'▲':'▼'}${Math.abs(x.pct).toFixed(2)}%</span></div>`}).join('');
+  const v=q.find(x=>x.sym==='VXN');
+  if(v){const e=$('#vix');e.textContent='VXN '+v.price.toFixed(1);
+    const col=v.price<18?'var(--green)':v.price<24?'#e8c33a':v.price<32?'var(--orange)':'var(--red)';
+    e.style.background=col;e.style.color='#0a0a08'}
+}catch(e){}}
+async function news(){try{const d=await(await fetch('/api/items')).json();
+  const t=d.filter(i=>i.level!=='BAJO').slice(0,12);
+  const T=i=>i.title_es||i.title;
+  if(t.length)$('#tick').innerHTML=t.map(i=>`<b>[${i.level==='CRITICO'?'CRÍTICO':i.level}]</b> ${esc(T(i))}<span class="s">◆</span>`).join('');
+  const c=d.find(i=>i.level==='CRITICO'&&(Date.now()/1000-i.ts)<1800);
+  if(c&&Date.now()-critMuted>1800000){$('#critxt').textContent=T(c).slice(0,120);$('#crit').style.display='flex'}
+  else if(!c)$('#crit').style.display='none';
+}catch(e){}}
+quotes();news();setInterval(quotes,15000);setInterval(news,30000);
+</script>
+</body>
+</html>

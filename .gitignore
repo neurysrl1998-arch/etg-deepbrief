@@ -1,0 +1,13 @@
+# Artefactos de compilación
+build/
+dist/
+*.spec
+__pycache__/
+*.pyc
+
+# Estado local del usuario (no debe viajar al repo)
+settings.json
+
+# Temporales de auto-actualización
+_update.bat
+*.new.exe

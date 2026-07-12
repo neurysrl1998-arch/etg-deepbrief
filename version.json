@@ -1,0 +1,5 @@
+{
+  "version": "3.3.0",
+  "notes": "• VXN (Nasdaq-100) en el panel de volatilidad\n• Editorial IA + chat 'Pregúntale al mercado' (Llama local)\n• Barra superior rediseñada (no se comprime)\n• Configuración con scroll (ya no se corta en monitores ultrawide)\n• Actualización automática desde GitHub",
+  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.3.0/ETG-DeepBrief.exe"
+}
