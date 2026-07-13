@@ -13,6 +13,50 @@ body[data-theme="azul"]{--bg:#060a12;--panel:#0b1220;--panel2:#0f1729;--line:#1c
 body[data-theme="matrix"]{--bg:#030803;--panel:#071207;--panel2:#0a1a0a;--line:#143314;--gold:#22cc55;--gold2:#55ff88;--ivory:#d8f5dd;--dim:#5f8f68}
 body[data-theme="claro"]{--bg:#eee8da;--panel:#faf7ef;--panel2:#f0e9d8;--line:#d5cbb2;--gold:#8a6d1a;--gold2:#5f4a0c;--ivory:#2a2418;--dim:#79704f}
 body[data-theme="guerra"]{--bg:#0d0505;--panel:#160909;--panel2:#1e0c0c;--line:#3a1515;--gold:#ff5a45;--gold2:#ff8a6b;--ivory:#f5e6e0;--dim:#a07f78}
+
+/* ============ DISEÑOS (estilo visual, combinable con el color) ============ */
+/* 🌆 Futurista Neón */
+body[data-design="neon"] .panel{border:1px solid var(--gold);border-radius:5px;box-shadow:0 0 16px -6px var(--gold);background:linear-gradient(155deg,var(--panel2),var(--bg))}
+body[data-design="neon"] .ph{text-transform:uppercase;letter-spacing:2.5px;border-bottom:1px solid var(--gold);text-shadow:0 0 7px var(--gold);background:transparent}
+body[data-design="neon"] #brand{text-shadow:0 0 12px var(--gold),0 0 26px var(--gold)}
+body[data-design="neon"] .badge,body[data-design="neon"] .nqbadge,body[data-design="neon"] .confchip{box-shadow:0 0 9px -2px currentColor}
+body[data-design="neon"] .item:hover{box-shadow:inset 3px 0 0 var(--gold)}
+body[data-design="neon"] .mbtn,body[data-design="neon"] .tab.act{box-shadow:0 0 10px -3px var(--gold)}
+
+/* ⚪ Minimalista */
+body[data-design="minimal"] .panel{border:0.5px solid var(--line);border-radius:6px;box-shadow:none;background:transparent}
+body[data-design="minimal"] .ph{background:transparent;border-bottom:0.5px solid var(--line);font-family:'Segoe UI',sans-serif;font-weight:400;letter-spacing:.5px;font-size:12px;text-transform:uppercase;color:var(--dim)}
+body[data-design="minimal"] #brand{font-family:'Segoe UI',sans-serif;font-weight:300;letter-spacing:0}
+body[data-design="minimal"] #brand small{letter-spacing:2px}
+body[data-design="minimal"] .item{border-bottom:0.5px solid var(--line)} body[data-design="minimal"] .lvl{width:2px}
+body[data-design="minimal"] .item.hot{animation:none;background:transparent}
+
+/* 💎 Cristal (glassmorphism) */
+body[data-design="cristal"] .panel{background:rgba(255,255,255,.055);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);border:1px solid rgba(255,255,255,.15);border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.35)}
+body[data-design="cristal"] .ph{background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.1)}
+body[data-design="cristal"] #masthead{backdrop-filter:blur(10px);background:rgba(255,255,255,.04)}
+body[data-design="cristal"] .item:hover{background:rgba(255,255,255,.07)}
+body[data-design="cristal"] .mbtn{background:rgba(255,255,255,.05);backdrop-filter:blur(8px)}
+
+/* 🖥️ Terminal Retro (CRT) */
+body[data-design="terminal"]{font-family:'Consolas','Courier New',monospace}
+body[data-design="terminal"] .panel{border:1px solid var(--gold);border-radius:0;box-shadow:none;background:var(--bg)}
+body[data-design="terminal"] .ph{font-family:'Consolas',monospace;text-transform:uppercase;letter-spacing:1px;border-bottom:1px dashed var(--gold);background:transparent}
+body[data-design="terminal"] #brand,body[data-design="terminal"] .item .tt,body[data-design="terminal"] #ed-text{font-family:'Consolas',monospace}
+body[data-design="terminal"] #brand{text-shadow:0 0 6px var(--gold)}
+body[data-design="terminal"] .item{border-bottom:1px dashed var(--line)}
+body[data-design="terminal"]::after{content:'';position:fixed;inset:0;z-index:9998;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0px,rgba(0,0,0,.16) 1px,transparent 1px,transparent 3px)}
+
+/* 📐 Neo-brutalista */
+body[data-design="brutal"] .panel{border:2px solid var(--gold);border-radius:0;box-shadow:5px 5px 0 var(--gold)}
+body[data-design="brutal"] .ph{background:var(--gold);color:var(--bg);border:none;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+body[data-design="brutal"] .ph .grab,body[data-design="brutal"] .ph .r{color:var(--bg)}
+body[data-design="brutal"] #brand{letter-spacing:0;font-weight:800}
+body[data-design="brutal"] .badge,body[data-design="brutal"] .nqbadge{border-radius:0}
+body[data-design="brutal"] .item{border-bottom:2px solid var(--line)}
+body[data-design="brutal"] .mbtn,body[data-design="brutal"] .tab{border-radius:0;border-width:2px}
+
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ivory);font:14px/1.45 'Segoe UI',system-ui,sans-serif;overflow-x:hidden;transition:background .4s}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
@@ -201,6 +245,10 @@ body.alarm::before{content:'';position:fixed;inset:0;pointer-events:none;z-index
 #themes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .thm{border:2px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600}
 .thm:hover{border-color:var(--dim)} .thm.act{border-color:var(--gold);background:var(--panel2)}
+#designs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.dsn{border:2px solid var(--line);border-radius:9px;padding:9px 10px;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.dsn b{font-size:12.5px;font-weight:600} .dsn span{font-size:10px;color:var(--dim)}
+.dsn:hover{border-color:var(--dim)} .dsn.act{border-color:var(--gold);background:var(--panel2)}
 .sw{width:26px;height:16px;border-radius:4px;flex:none;border:1px solid rgba(255,255,255,.2)}
 .optrow{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
 .optrow .mbtn{margin-left:auto;font-size:12px;padding:5px 12px}
@@ -212,6 +260,54 @@ body.alarm::before{content:'';position:fixed;inset:0;pointer-events:none;z-index
 .since{margin-top:5px;font-size:11.5px;color:var(--dim);background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:3px 8px;display:inline-block}
 .since b{font-weight:800}
 .ai{margin-top:5px;font-size:12px;line-height:1.4;color:var(--gold2);background:var(--panel2);border-left:3px solid var(--gold);border-radius:0 6px 6px 0;padding:5px 9px}
+/* 🧠 nota profesional estructurada */
+.pronote{margin-top:6px;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;background:var(--panel2);overflow:hidden}
+.pronote .head{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;flex-wrap:wrap}
+.pronote .head:hover{background:rgba(212,175,55,.06)}
+.pronote .src{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--gold)}
+.pronote .nqbadge{font-size:10px;font-weight:800;padding:1.5px 8px;border-radius:5px;color:#0a0a08}
+.pronote .biaslbl{font-size:11px;font-weight:700}
+.pronote .instc{font-size:11px;color:var(--dim)}
+.pronote .caret{margin-left:auto;color:var(--dim);font-size:11px;transition:transform .2s}
+.pronote.open .caret{transform:rotate(180deg)}
+.pronote .body{display:none;padding:2px 10px 9px;font-size:12px;line-height:1.5}
+.pronote.open .body{display:block;animation:fadein .25s}
+.pronote .row{margin-top:6px}
+.pronote .lbl{font-size:9.5px;font-weight:800;letter-spacing:1px;color:var(--dim);display:block;margin-bottom:1px}
+.pronote .chain{color:var(--gold2);font-family:'Consolas',monospace;font-size:11.5px}
+.pronote .bull{color:var(--green)} .pronote .bear{color:var(--red)}
+.conf-Alta{color:var(--green)} .conf-Media{color:var(--yellow)} .conf-Baja{color:var(--dim)}
+
+/* 🎯 tesis macro del día */
+#thesis{display:none;margin:0 14px 4px;padding:10px 13px;border-radius:9px;border:1px solid var(--gold);
+  background:linear-gradient(100deg,var(--panel2),rgba(212,175,55,.06));position:relative;overflow:hidden}
+#thesis::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(105deg,transparent,rgba(212,175,55,.10),transparent);animation:sweep 5s infinite}
+#thesis .tl{font-size:10px;font-weight:800;letter-spacing:2px;color:var(--dim)}
+#thesis .reg{font-size:15px;font-weight:800;color:var(--gold2);margin:2px 0}
+#thesis .ses{font-size:12px;color:var(--ivory)}
+#thesis .meta{font-size:10.5px;color:var(--dim);margin-top:3px}
+
+/* ✨ skeletons */
+.skel{height:11px;border-radius:5px;margin-bottom:7px;background:linear-gradient(90deg,var(--panel2) 25%,var(--line) 50%,var(--panel2) 75%);background-size:200% 100%;animation:skel 1.3s infinite}
+@keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ✨ #9 entrada de titulares con vida + pulso en críticos */
+.item{animation:itemin .5s cubic-bezier(.2,1,.3,1)}
+@keyframes itemin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.item.CRITICO .lvl{position:relative}
+.item.CRITICO .lvl::after{content:'';position:absolute;inset:-2px;border-radius:4px;box-shadow:0 0 8px 2px var(--red);animation:critpulse 1.3s infinite}
+@keyframes critpulse{0%,100%{opacity:.4}50%{opacity:1}}
+/* cursor de máquina de escribir */
+.tw-cursor{display:inline-block;width:7px;background:var(--gold);margin-left:1px;animation:twblink .7s step-end infinite}
+@keyframes twblink{50%{opacity:0}}
+
+/* ✨ #10 fondo táctico sutil animado */
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  background:radial-gradient(900px circle at 15% -10%,rgba(212,175,55,.05),transparent 60%),
+             radial-gradient(1000px circle at 100% 110%,rgba(212,175,55,.04),transparent 55%);
+  animation:bgdrift 22s ease-in-out infinite alternate}
+@keyframes bgdrift{from{transform:translate(0,0)}to{transform:translate(-24px,18px)}}
 .confchip{font-size:10px;font-weight:800;color:var(--green);border:1px solid var(--green);padding:1px 7px;border-radius:4px;letter-spacing:.5px}
 .clchip{font-size:10px;color:var(--dim);border:1px solid var(--line);padding:1px 7px;border-radius:4px}
 .spark{display:block;margin-top:3px;opacity:.9}
@@ -322,6 +418,12 @@ body.alarm::before{content:'';position:fixed;inset:0;pointer-events:none;z-index
   <div class="col" id="col-left">
     <div class="panel" data-pid="portada">
       <div class="ph"><span class="grab" title="Arrastra para mover">⠿</span>📰 PORTADA <span class="r" id="briefage"></span></div>
+      <div id="thesis">
+        <div class="tl">🎯 TESIS DEL DÍA</div>
+        <div class="reg" id="th-reg">—</div>
+        <div class="ses" id="th-ses"></div>
+        <div class="meta" id="th-meta"></div>
+      </div>
       <div id="editorial" style="display:none">
         <div id="ed-head"><span class="t">🧠 EDITORIAL · ANÁLISIS IA</span><span id="ed-refresh" title="Regenerar">↻</span></div>
         <div id="ed-text"></div>
@@ -444,6 +546,17 @@ body.alarm::before{content:'';position:fixed;inset:0;pointer-events:none;z-index
       </div>
     </div>
     <div class="sec">
+      <div class="sl">DISEÑO VISUAL</div>
+      <div id="designs">
+        <div class="dsn" data-d=""><b>Editorial</b><span>clásico · serif</span></div>
+        <div class="dsn" data-d="neon"><b>Futurista Neón</b><span>glow · cyber</span></div>
+        <div class="dsn" data-d="minimal"><b>Minimalista</b><span>limpio · aire</span></div>
+        <div class="dsn" data-d="cristal"><b>Cristal</b><span>glass · blur</span></div>
+        <div class="dsn" data-d="terminal"><b>Terminal Retro</b><span>CRT · mono</span></div>
+        <div class="dsn" data-d="brutal"><b>Neo-brutalista</b><span>bloques · fuerte</span></div>
+      </div>
+    </div>
+    <div class="sec">
       <div class="sl">ALERTAS</div>
       <div class="optrow">🔥 Ventana emergente de noticias calientes <span class="switch" id="swtoast"></span></div>
       <div class="optrow">🚨 Animación "ÚLTIMA HORA" en críticos <span class="switch" id="swbreak"></span></div>
@@ -517,6 +630,12 @@ function applyTheme(t,save=true){document.body.dataset.theme=t||'';if(save)local
   $$('.thm').forEach(x=>x.classList.toggle('act',(x.dataset.t||'')===(t||'')))}
 applyTheme(localStorage.getItem('etg_theme')||'');
 $$('.thm').forEach(x=>x.onclick=()=>applyTheme(x.dataset.t));
+
+/* ---------- diseño visual ---------- */
+function applyDesign(d,save=true){document.body.dataset.design=d||'';if(save)localStorage.setItem('etg_design',d||'');
+  $$('.dsn').forEach(x=>x.classList.toggle('act',(x.dataset.d||'')===(d||'')))}
+applyDesign(localStorage.getItem('etg_design')||'');
+$$('.dsn').forEach(x=>x.onclick=()=>applyDesign(x.dataset.d));
 
 /* ---------- configuración ---------- */
 $('#cfgbtn').onclick=()=>{$('#cfgwrap').style.display='block';syncSwitches()};
@@ -605,6 +724,26 @@ function ago(ts){const s=Math.floor(Date.now()/1000-ts);
   if(s<86400)return'hace '+Math.floor(s/3600)+' h';return'hace '+Math.floor(s/86400)+' d'}
 function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
 const isHot=i=>(i.level==='CRITICO'||i.level==='ALTO')&&(Date.now()/1000-i.ts)<HOT_WINDOW;
+const nqColor=n=>n>=8?'var(--red)':n>=5?'var(--orange)':n>=3?'var(--yellow)':'var(--dim)';
+/* 🧠 nota profesional estructurada (desplegable) */
+function proNote(ai){
+  if(!ai)return'';
+  const nq=(typeof ai.nq==='number')?ai.nq:null;
+  const body=`
+    ${ai.porque?`<div class="row"><span class="lbl">POR QUÉ IMPORTA</span>${esc(ai.porque)}</div>`:''}
+    ${ai.chain?`<div class="row"><span class="lbl">CADENA DE EFECTOS (2º ORDEN)</span><span class="chain">${esc(ai.chain)}</span></div>`:''}
+    ${(ai.bull||ai.bear)?`<div class="row"><span class="lbl">ESCENARIOS</span>${ai.bull?`<div>🐂 <span class="bull">${esc(ai.bull)}</span></div>`:''}${ai.bear?`<div>🐻 <span class="bear">${esc(ai.bear)}</span></div>`:''}</div>`:''}
+    ${ai.watch?`<div class="row"><span class="lbl">QUÉ VIGILAR</span>${esc(ai.watch)}</div>`:''}
+    ${ai.conf?`<div class="row"><span class="lbl">CONFIANZA</span><span class="conf-${esc(ai.conf)}">${esc(ai.conf)}</span></div>`:''}`;
+  return `<div class="pronote">
+    <div class="head" onclick="this.parentNode.classList.toggle('open')">
+      <span class="src">🧠 ${ai.src==='🤖 IA'?'ANÁLISIS IA':'ANÁLISIS PRO'}</span>
+      ${nq!==null?`<span class="nqbadge" style="background:${nqColor(nq)}">IMPACTO NQ ${nq}/10</span>`:''}
+      <span class="biaslbl">${esc(ai.bias||'')}</span>
+      ${ai.inst?`<span class="instc">${esc(ai.inst)}</span>`:''}
+      <span class="caret">▾</span>
+    </div><div class="body">${body}</div></div>`;
+}
 
 /* ---------- ÚLTIMA HORA (animación TV) ---------- */
 let bkTimer=null;
@@ -668,15 +807,14 @@ async function loadItems(){
     const r=await fetch(`/api/items?cat=${CAT}&q=${encodeURIComponent(Q)}`);const data=await r.json();
     const st=$('#stream');st.innerHTML='';
     data.forEach(i=>{
-      const div=document.createElement('div');div.className='item'+(isHot(i)?' hot':'');
+      const div=document.createElement('div');div.className='item'+(i.level==='CRITICO'?' CRITICO':'')+(isHot(i)?' hot':'');
       const conf=i.cluster>=4?`<span class="confchip">✅ CONFIRMADO ×${i.cluster}</span>`:(i.cluster>=2?`<span class="clchip">🔗 ${i.cluster} fuentes</span>`:'');
       const since=(i.since&&i.since.length)?`<div class="since">📸 Desde esta noticia: ${i.since.map(s=>`${s.sym} <b class="${s.pct>=0?'up':'dn'}">${s.pct>=0?'+':''}${s.pct.toFixed(2)}%</b>`).join(' · ')}</div>`:'';
-      const ai=i.ai?`<div class="ai">🧠 <b>${esc(i.ai.bias)}</b>${i.ai.inst?' · '+esc(i.ai.inst):''} — ${esc(i.ai.note)}</div>`:'';
       div.innerHTML=`<div class="lvl ${i.level}"></div><div class="tx">
         <div class="tt"><a href="${esc(i.link)}" target="_blank">${esc(T(i))}</a></div>
         <div class="mt">${isHot(i)?'<span class="hotchip">🔥 CALIENTE</span>':''}<span class="badge ${i.level}">${i.level==='CRITICO'?'CRÍTICO':i.level}</span>
         ${conf}<span class="catchip" style="color:${CATC[i.cat]||'var(--gold)'}">${CATN[i.cat]||i.cat}</span>
-        <span>${esc(i.source)}</span><span>·</span><span>${ago(i.ts)}</span></div>${ai}${since}</div>`;
+        <span>${esc(i.source)}</span><span>·</span><span>${ago(i.ts)}</span></div>${proNote(i.ai)}${since}</div>`;
       st.appendChild(div);
     });
     if(!data.length)st.innerHTML='<div style="padding:30px;color:var(--dim)">Sin resultados para este filtro todavía…</div>';
@@ -687,11 +825,14 @@ async function loadItems(){
 async function loadBrief(){
   try{
     const r=await fetch('/api/brief');const b=await r.json();
+    if(b.thesis){const th=b.thesis;$('#thesis').style.display='block';
+      $('#th-reg').textContent=th.regime;$('#th-ses').textContent=th.sesgo;
+      $('#th-meta').innerHTML=`Motor del día: <b style="color:var(--gold2)">${esc(th.driver)}</b> · Tensión ${th.tension}/100 (${esc(th.tension_label)})${th.vxn?' · VXN '+(+th.vxn).toFixed(1):''}${th.fng!=null?' · F&amp;G '+th.fng:''}`;}
     if(b.top&&b.top.length){
       const t=b.top[0];
       $('#topstory').innerHTML=`<div class="kick">${t.level==='CRITICO'?'🚨 CRÍTICO':'LO MÁS RELEVANTE'} · ${CATN[t.cat]||''}</div>
         <h1><a href="${esc(t.link)}" target="_blank">${esc(T(t))}</a></h1>
-        <div class="meta">${esc(t.source)} · ${ago(t.ts)}</div>`;
+        <div class="meta">${esc(t.source)} · ${ago(t.ts)}</div>${proNote(t.ai)}`;
       $('#briefsecs').innerHTML=b.sections.map(s=>`<div class="briefsec">
         <div class="bt" style="color:${CATC[s.cat]||'var(--gold)'}">${CATN[s.cat]||s.cat}</div>
         <ul>${s.items.map(i=>`<li>▸ <a href="${esc(i.link)}" target="_blank">${esc(T(i))}</a> <span class="src">— ${esc(i.source)}, ${ago(i.ts)}</span></li>`).join('')}</ul></div>`).join('');
@@ -869,6 +1010,17 @@ $('#aissave').onclick=async()=>{
   $('#aisstate').innerHTML=r.ais_key?'<span class="okdot">●</span> Clave guardada — abre el mapa 🗺️ y verás los barcos en ~1 min':'<span class="baddot">●</span> Sin clave — pega una de aisstream.io';
 };
 
+let twTimer=null, lastEd='';
+function renderEdParas(text){return esc(text).split(/\n{2,}|\n/).filter(Boolean).map(p=>`<p>${p}</p>`).join('')}
+function typeEditorial(text){
+  clearInterval(twTimer);
+  const el=$('#ed-text');el.innerHTML='<span id="tw-span"></span><span class="tw-cursor">&nbsp;</span>';
+  const span=$('#tw-span');let i=0;const raw=text;
+  twTimer=setInterval(()=>{
+    i+=2;span.textContent=raw.slice(0,i);
+    if(i>=raw.length){clearInterval(twTimer);el.innerHTML=renderEdParas(raw);}
+  },12);
+}
 async function loadEditorial(){
   try{
     const d=await(await fetch('/api/editorial')).json();
@@ -876,16 +1028,16 @@ async function loadEditorial(){
     if(!d.on){box.style.display='none';return;}
     box.style.display='block';
     if(d.text){
-      $('#ed-text').innerHTML=esc(d.text).split(/\n{2,}|\n/).filter(Boolean).map(p=>`<p>${p}</p>`).join('');
-      $('#ed-time').textContent='Generado por IA · '+(d.generated?ago(d.generated):'ahora');
+      if(d.text!==lastEd){lastEd=d.text;typeEditorial(d.text);}  // ✍️ máquina de escribir solo al cambiar
+      $('#ed-time').textContent='✍️ Redactado por IA · '+(d.generated?ago(d.generated):'ahora');
     }else{
-      $('#ed-text').innerHTML='<p class="off"><span class="ai-spin"></span> El analista IA está redactando el editorial de hoy…</p>';
-      $('#ed-time').textContent='';
+      $('#ed-text').innerHTML='<div class="skel" style="width:100%"></div><div class="skel" style="width:94%"></div><div class="skel" style="width:78%"></div>';
+      $('#ed-time').textContent='El analista IA está redactando…';
     }
   }catch(e){}
 }
 $('#ed-refresh').onclick=async()=>{
-  $('#ed-text').innerHTML='<p class="off"><span class="ai-spin"></span> Regenerando editorial…</p>';$('#ed-time').textContent='';
+  lastEd='';$('#ed-text').innerHTML='<div class="skel" style="width:100%"></div><div class="skel" style="width:90%"></div><div class="skel" style="width:82%"></div>';$('#ed-time').textContent='Regenerando…';
   await fetch('/api/editorial',{method:'POST'});
   setTimeout(loadEditorial,4000);setTimeout(loadEditorial,12000);setTimeout(loadEditorial,22000);
 };

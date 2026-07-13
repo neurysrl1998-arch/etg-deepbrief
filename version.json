@@ -1,5 +1,5 @@
 {
-  "version": "3.5.0",
-  "notes": "🎮 Mapa de guerra estilo videojuego\n• Explosiones, misiles y aviones atacando en tiempo real\n• Combate animado en zonas bajo ataque\n• Detector pre-ataque (cisternas/AWACS/bombarderos)\n• Estrecho de Ormuz + barcos en vivo (con clave AIS gratuita)\n• Aviones militares reales con forma y rumbo",
-  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.5.0/ETG-DeepBrief.exe"
+  "version": "3.7.0",
+  "notes": "🎨 5 diseños visuales seleccionables (Neón, Minimalista, Cristal, Terminal Retro, Neo-brutalista) combinables con los colores\n🧠 Análisis institucional por noticia (por qué importa, cadena de efectos, alcista/bajista, score de impacto NQ)\n🎯 Tesis macro del día · editorial IA con máquina de escribir · animaciones y críticos pulsantes",
+  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.7.0/ETG-DeepBrief.exe"
 }

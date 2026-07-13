@@ -32,7 +32,7 @@ POLL_META_SEC   = 300    # calendario + fear&greed
 MAX_ITEMS       = 900
 KEEP_HOURS      = 48
 
-APP_VERSION = "3.5.0"
+APP_VERSION = "3.7.0"
 GH_REPO     = "neurysrl1998-arch/etg-deepbrief"
 RAW_VERSION_URL = f"https://raw.githubusercontent.com/{GH_REPO}/main/version.json"
 
@@ -411,33 +411,98 @@ def recluster():
 # ------------------------------------------------------------------ 🧠 analista (heurístico + Llama opcional)
 AI_CACHE = {}
 
+def _inst(up, dn):
+    return (("▲ " + ", ".join(up)) if up else "") + ((" · ▼ " + ", ".join(dn)) if dn else "")
+
 def analyze(i):
-    t = (i["title"] or "").lower()
-    bias, up, dn, notes = None, [], [], []
-    if re.search(r'hormuz|strait', t) and re.search(r'clos|block|attack|seiz|mine|shut', t):
-        bias = "RISK-OFF FUERTE"; up = ["CL", "GC", "VXN"]; dn = ["NQ", "ES"]
-        notes.append("Shock petrolero en juego: prima de riesgo en crudo/oro y presión sobre índices.")
-    elif i["cat"] == "geo" and GEO_ACTION.search(i["title"] or ""):
-        bias = "RISK-OFF"; up = ["GC", "CL", "VXN"]; dn = ["NQ", "ES"]
-        notes.append("Escalada geopolítica: flujo a refugio (oro) y cautela en índices.")
-    if re.search(r'tariff', t):
-        bias = bias or "RISK-OFF"; dn = sorted(set(dn + ["NQ", "ES"]))
-        notes.append("Aranceles: presión sobre índices y cadenas de suministro.")
-    if re.search(r'rate cut|dovish|inflation (cool|slow|fall|eas)|cpi (below|cool)', t):
-        bias = "RISK-ON"; up = sorted(set(up + ["NQ", "ES"]))
-        notes.append("Sesgo dovish: alivio para tecnología e índices.")
-    if re.search(r'rate hike|hawkish|hot inflation|cpi (above|hot|rise)|yields? (surge|spike|jump)', t):
-        bias = "RISK-OFF"; dn = sorted(set(dn + ["NQ", "ES"]))
-        notes.append("Sesgo hawkish: presión sobre el NQ y activos de duración larga.")
-    if re.search(r'opec|(supply|production|output) cut', t):
-        up = sorted(set(up + ["CL"])); bias = bias or "NEUTRO"
-        notes.append("Recorte de oferta: soporte estructural para el crudo.")
-    if bias is None:
-        bias = "NEUTRO"; notes.append("Impacto direccional limitado: deja que el precio confirme.")
+    """Nota estructurada tipo mesa institucional (heurística — funciona sin IA)."""
+    title = i["title"] or ""
+    t = title.lower()
+    up, dn = [], []
+    bias, nq, conf = "NEUTRO", 2, "Baja"
+    porque = chain = bull = bear = watch = ""
+    if re.search(r'hormuz|strait', t) and re.search(r'clos|block|attack|seiz|mine|shut|tanker', t):
+        bias, up, dn, nq, conf = "RISK-OFF FUERTE", ["CL", "GC", "VXN"], ["NQ", "ES"], 8, "Alta"
+        porque = "Por Ormuz pasa ~20% del petróleo mundial; una interrupción dispara la prima de riesgo energética."
+        chain = "Ormuz interrumpido → crudo ↑ → inflación ↑ → Fed más hawkish → presión sobre NQ/ES."
+        bull = "Si es temporal o hay desescalada rápida, el crudo devuelve la subida y el NQ rebota."
+        bear = "Cierre prolongado o escalada militar: crudo +5-10%, risk-off global, NQ bajo presión sostenida."
+        watch = "Confirmación oficial, respuesta de EE.UU., gap del crudo y del NQ en la apertura."
+    elif i["cat"] == "geo" and GEO_ACTION.search(title):
+        bias, up, dn, nq, conf = "RISK-OFF", ["GC", "CL", "VXN"], ["NQ", "ES"], 6, "Media"
+        porque = "Escalada geopolítica: el capital busca refugio (oro) y reduce exposición a índices."
+        chain = "Escalada → flujo a refugio → oro/crudo ↑, índices ↓ hasta que baje la incertidumbre."
+        bull = "Sin víctimas ni expansión, el mercado suele descontarlo en horas."
+        bear = "Si involucra grandes potencias o energía, el risk-off se extiende."
+        watch = "Respuesta de las partes, si toca infraestructura energética, confirmación multi-fuente."
+    elif re.search(r'tariff|trade war', t):
+        bias, dn, nq, conf = "RISK-OFF", ["NQ", "ES"], 6, "Media"
+        porque = "Los aranceles presionan márgenes y cadenas de suministro; negativo para tecnología."
+        chain = "Aranceles → costos ↑ / márgenes ↓ → guidance corporativo peor → NQ ↓."
+        bull = "Si son negociables o menores a lo temido, alivio y rebote."
+        bear = "Represalias y guerra comercial: presión sostenida sobre el Nasdaq."
+        watch = "Sectores afectados, represalias, reacción de las grandes tecnológicas."
+    elif re.search(r'rate cut|dovish|inflation (cool|slow|fall|eas)|cpi (below|cool|miss)|softer inflation', t):
+        bias, up, nq, conf = "RISK-ON", ["NQ", "ES"], 7, "Alta"
+        porque = "Sesgo dovish o inflación más baja alivia las tasas y favorece a activos de larga duración como el Nasdaq."
+        chain = "Inflación ↓ / dovish → expectativa de recortes → tasas ↓ → NQ ↑."
+        bull = "Confirmación de desinflación: rally en tecnología y caída de volatilidad."
+        bear = "Si se lee como 'debilidad económica', el alivio se apaga."
+        watch = "Rendimiento del 10Y, próximos datos (PCE/NFP), tono de la Fed."
+    elif re.search(r'rate hike|hawkish|hot inflation|cpi (above|hot|rise|beat)|yields? (surge|spike|jump)|strong jobs', t):
+        bias, dn, up, nq, conf = "RISK-OFF", ["NQ", "ES"], ["VXN"], 7, "Alta"
+        porque = "Datos calientes o tono hawkish empujan las tasas al alza, lo más tóxico para el Nasdaq."
+        chain = "Inflación ↑ / hawkish → tasas ↑ → descuento de flujos futuros → NQ ↓."
+        bull = "Si el dato es puntual o hay matices dovish, el golpe se revierte."
+        bear = "Tendencia inflacionaria persistente: presión estructural sobre el NQ."
+        watch = "Rendimiento del 10Y, probabilidad de recortes, próximos datos de inflación."
+    elif re.search(r'opec|(supply|production|output) cut|oil', t):
+        bias, up, nq, conf = "NEUTRO", ["CL"], 3, "Media"
+        porque = "Movimiento en la oferta de crudo; efecto indirecto en índices vía inflación."
+        chain = "Oferta petrolera ↓ → crudo ↑ → presión inflacionaria leve → sesgo levemente negativo para NQ."
+        bull = "Demanda débil puede neutralizar el efecto."
+        bear = "Con demanda firme, el crudo sostiene subidas e importa a la Fed."
+        watch = "Inventarios de crudo, cumplimiento de recortes, reacción del WTI."
+    else:
+        porque = "Impacto direccional limitado; deja que el precio confirme antes de actuar."
+        watch = "Confirmación por más fuentes y reacción inicial del precio."
+        if i["cat"] == "fed":
+            porque = "Relacionado con política monetaria; puede mover tasas y el NQ según el tono."; nq = 4; conf = "Media"
+    if i.get("cluster", 1) >= 4 and conf != "Alta":
+        conf = "Alta"
     if datetime.now(NY).weekday() >= 5 and (up or dn):
-        notes.append("Mercado cerrado: riesgo de GAP en la apertura del domingo 18:00 NY.")
-    inst = (("▲ " + ", ".join(up)) if up else "") + ((" · ▼ " + ", ".join(dn)) if dn else "")
-    return {"bias": bias, "inst": inst.strip(), "note": " ".join(notes)[:230]}
+        watch = (watch + " Riesgo de GAP en la apertura del domingo 18:00 NY.").strip()
+    return {"bias": bias, "inst": _inst(up, dn), "note": porque[:230], "que": title[:170],
+            "porque": porque, "chain": chain, "bull": bull, "bear": bear,
+            "nq": nq, "conf": conf, "watch": watch, "src": "heurístico"}
+
+def llama_analyze(item):
+    """Enriquece la nota estructurada con el Llama local (JSON)."""
+    base = analyze(item)
+    sysp = ("Eres analista senior de futuros (NQ=Nasdaq, ES=S&P 500, GC=oro, CL=petróleo, VXN=volatilidad Nasdaq). "
+            "Analiza el titular y responde SOLO con un objeto JSON válido en español, sin texto adicional, con estas claves: "
+            '{"porque":"por qué importa, 1 frase","inst":"instrumentos con dirección ej ▲CL, GC · ▼NQ",'
+            '"chain":"cadena de efectos de segundo orden con flechas →","bull":"caso alcista para el mercado, 1 frase",'
+            '"bear":"caso bajista, 1 frase","watch":"qué vigilar, 1 frase","nq":entero 0-10 de impacto en el NQ,"conf":"Alta/Media/Baja"}. '
+            "No inventes cifras concretas de precio.")
+    out = llama_chat([{"role": "system", "content": sysp}, {"role": "user", "content": item["title"]}],
+                     max_tokens=360, temperature=0.3, timeout=90)
+    if out:
+        m = re.search(r'\{.*\}', out, re.S)
+        if m:
+            try:
+                j = json.loads(m.group(0))
+                for k in ("porque", "inst", "chain", "bull", "bear", "watch", "conf"):
+                    if j.get(k): base[k] = str(j[k])[:280]
+                if isinstance(j.get("nq"), (int, float)):
+                    base["nq"] = max(0, min(10, int(j["nq"])))
+                base["que"] = item["title"][:170]
+                base["note"] = base["porque"][:230]
+                base["bias"] = "🤖 IA"
+                base["src"] = "🤖 IA"
+            except Exception:
+                pass
+    return base
 
 def llama_on():
     return bool((SETTINGS.get("llama_url") or "").strip())
@@ -471,10 +536,9 @@ def llama_loop():
                     cand = [i for i in ITEMS if i["level"] in ("CRITICO", "ALTO")
                             and time.time() - i["ts"] < 3 * 3600 and i["id"] not in AI_CACHE][:3]
                 for i in cand:
-                    txt = llama_chat([
-                        {"role": "system", "content": "Eres analista de futuros (NQ=Nasdaq, ES=S&P, GC=oro, CL=petróleo). Responde en español en máximo 2 frases: sesgo (RISK-ON/RISK-OFF/NEUTRO), instrumentos afectados con ▲/▼ y un consejo operativo concreto. No des consejo financiero personalizado ni cifras inventadas."},
-                        {"role": "user", "content": i["title"]}], max_tokens=120, temperature=0.3, timeout=60)
-                    if txt: AI_CACHE[i["id"]] = {"bias": "🤖 IA", "inst": "", "note": txt[:320]}
+                    res = llama_analyze(i)
+                    if res.get("src") == "🤖 IA":
+                        AI_CACHE[i["id"]] = res
         except Exception:
             pass
         time.sleep(10)
@@ -559,6 +623,34 @@ def tension():
     elif val >= 22: label = "ELEVADA"
     else: label = "NORMAL"
     return {"value": val, "label": label, "criticos": crit, "altos": alto}
+
+CAT_ES = {"geo": "geopolítica", "trump": "Trump", "fed": "la Fed", "markets": "mercados",
+          "energy": "energía", "crypto": "cripto", "watch": "vigilancia"}
+
+def macro_thesis():
+    """🧠 #3 Tesis macro del día: régimen + sesgo, sintetizando todo el flujo."""
+    from collections import Counter
+    tn = tension()
+    vxn = QUOTES.get("VXN", {}).get("price")
+    fng = FNG.get("score")
+    cutoff = time.time() - 6 * 3600
+    with LOCK:
+        hot = [i for i in ITEMS if i["ts"] > cutoff and i["level"] in ("CRITICO", "ALTO")]
+    cats = Counter(i["cat"] for i in hot)
+    dom = cats.most_common(1)[0][0] if cats else None
+    driver = CAT_ES.get(dom, "sin catalizador claro")
+    if tn["value"] >= 60 and dom == "geo":
+        regime, sesgo = "RISK-OFF · geopolítica", "Defensivo. Refugio en oro/crudo, cautela en NQ/ES."
+    elif dom == "fed":
+        regime, sesgo = "Foco en la Fed", "Sensible a tasas: el NQ reacciona al tono monetario y a los datos."
+    elif tn["value"] >= 45:
+        regime, sesgo = "RISK-OFF moderado", "Reducir tamaño y esperar confirmación antes de entrar."
+    elif fng is not None and fng >= 60:
+        regime, sesgo = "RISK-ON · apetito por riesgo", "Sesgo comprador, pero cuidado con la euforia."
+    else:
+        regime, sesgo = "Mixto / sin catalizador claro", "Dejar que el precio lidere; operar reactivo."
+    return {"regime": regime, "sesgo": sesgo, "driver": driver, "tension": tn["value"],
+            "tension_label": tn["label"], "vxn": vxn, "fng": fng}
 
 # ================================================================== 🗺️ MAPA DE GUERRA (integrado)
 import math as _math
@@ -908,7 +1000,10 @@ def api_brief():
     for cat in ("geo", "trump", "fed", "markets", "energy", "crypto", "watch"):
         if cat in groups:
             sections.append({"cat": cat, "items": with_es(groups[cat][:4])})
-    return jsonify({"top": with_es(top), "sections": sections, "generated": time.time()})
+    top_es = with_es(top)
+    for it in top_es:
+        it["ai"] = AI_CACHE.get(it["id"]) or analyze(it)
+    return jsonify({"top": top_es, "sections": sections, "thesis": macro_thesis(), "generated": time.time()})
 
 @app.get("/cinta")
 def cinta():
