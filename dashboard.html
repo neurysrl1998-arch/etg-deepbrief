@@ -14,32 +14,51 @@ body[data-theme="matrix"]{--bg:#030803;--panel:#071207;--panel2:#0a1a0a;--line:#
 body[data-theme="claro"]{--bg:#eee8da;--panel:#faf7ef;--panel2:#f0e9d8;--line:#d5cbb2;--gold:#8a6d1a;--gold2:#5f4a0c;--ivory:#2a2418;--dim:#79704f}
 body[data-theme="guerra"]{--bg:#0d0505;--panel:#160909;--panel2:#1e0c0c;--line:#3a1515;--gold:#ff5a45;--gold2:#ff8a6b;--ivory:#f5e6e0;--dim:#a07f78}
 
-/* ============ DISEÑOS (estilo visual, combinable con el color) ============ */
-/* 🌆 Futurista Neón */
+/* ============ DISEÑOS — layout COMPLETO distinto por cada uno ============ */
+
+/* 🌆 Futurista Neón — feed ANCHO a la izquierda + rail combinado a la derecha */
+body[data-design="neon"] #grid{grid-template-columns:1fr 340px;align-items:start}
+body[data-design="neon"] #p-stream{grid-column:1;grid-row:1 / span 2}
+body[data-design="neon"] #col-left{grid-column:2;grid-row:1}
+body[data-design="neon"] #col-right{grid-column:2;grid-row:2}
+body[data-design="neon"] #stream{max-height:calc(100vh - 205px)}
 body[data-design="neon"] .panel{border:1px solid var(--gold);border-radius:5px;box-shadow:0 0 16px -6px var(--gold);background:linear-gradient(155deg,var(--panel2),var(--bg))}
 body[data-design="neon"] .ph{text-transform:uppercase;letter-spacing:2.5px;border-bottom:1px solid var(--gold);text-shadow:0 0 7px var(--gold);background:transparent}
 body[data-design="neon"] #brand{text-shadow:0 0 12px var(--gold),0 0 26px var(--gold)}
 body[data-design="neon"] .badge,body[data-design="neon"] .nqbadge,body[data-design="neon"] .confchip{box-shadow:0 0 9px -2px currentColor}
 body[data-design="neon"] .item:hover{box-shadow:inset 3px 0 0 var(--gold)}
-body[data-design="neon"] .mbtn,body[data-design="neon"] .tab.act{box-shadow:0 0 10px -3px var(--gold)}
 
-/* ⚪ Minimalista */
-body[data-design="minimal"] .panel{border:0.5px solid var(--line);border-radius:6px;box-shadow:none;background:transparent}
+/* ⚪ Minimalista — UNA sola columna centrada, modo lectura */
+body[data-design="minimal"] #grid{grid-template-columns:min(760px,100%);justify-content:center;padding-bottom:46px}
+body[data-design="minimal"] #col-left{order:1}
+body[data-design="minimal"] #p-stream{order:2}
+body[data-design="minimal"] #col-right{order:3;display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+body[data-design="minimal"] #stream{max-height:none}
+body[data-design="minimal"] .panel{border:0;border-radius:0;box-shadow:none;background:transparent;border-bottom:0.5px solid var(--line)}
 body[data-design="minimal"] .ph{background:transparent;border-bottom:0.5px solid var(--line);font-family:'Segoe UI',sans-serif;font-weight:400;letter-spacing:.5px;font-size:12px;text-transform:uppercase;color:var(--dim)}
 body[data-design="minimal"] #brand{font-family:'Segoe UI',sans-serif;font-weight:300;letter-spacing:0}
-body[data-design="minimal"] #brand small{letter-spacing:2px}
-body[data-design="minimal"] .item{border-bottom:0.5px solid var(--line)} body[data-design="minimal"] .lvl{width:2px}
+body[data-design="minimal"] #tabs{background:transparent}
+body[data-design="minimal"] .lvl{width:2px}
 body[data-design="minimal"] .item.hot{animation:none;background:transparent}
 
-/* 💎 Cristal (glassmorphism) */
+/* 💎 Cristal — rail IZQUIERDO (portada+intel) + feed ancho a la DERECHA, vidrio */
+body[data-design="cristal"] #grid{grid-template-columns:330px 1fr;align-items:start}
+body[data-design="cristal"] #col-left{grid-column:1;grid-row:1}
+body[data-design="cristal"] #col-right{grid-column:1;grid-row:2}
+body[data-design="cristal"] #p-stream{grid-column:2;grid-row:1 / span 2}
+body[data-design="cristal"] #stream{max-height:calc(100vh - 205px)}
 body[data-design="cristal"] .panel{background:rgba(255,255,255,.055);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);border:1px solid rgba(255,255,255,.15);border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.35)}
-body[data-design="cristal"] .ph{background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.1)}
+body[data-design="cristal"] .ph{background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.1);border-radius:16px 16px 0 0}
 body[data-design="cristal"] #masthead{backdrop-filter:blur(10px);background:rgba(255,255,255,.04)}
 body[data-design="cristal"] .item:hover{background:rgba(255,255,255,.07)}
-body[data-design="cristal"] .mbtn{background:rgba(255,255,255,.05);backdrop-filter:blur(8px)}
 
-/* 🖥️ Terminal Retro (CRT) */
+/* 🖥️ Terminal Retro — DASHBOARD a lo ancho: mercado arriba, feed full, portada abajo */
 body[data-design="terminal"]{font-family:'Consolas','Courier New',monospace}
+body[data-design="terminal"] #grid{display:flex;flex-direction:column;gap:8px;padding:10px 12px 46px}
+body[data-design="terminal"] #col-right{order:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:8px;align-items:start}
+body[data-design="terminal"] #p-stream{order:2}
+body[data-design="terminal"] #col-left{order:3;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+body[data-design="terminal"] #stream{max-height:540px}
 body[data-design="terminal"] .panel{border:1px solid var(--gold);border-radius:0;box-shadow:none;background:var(--bg)}
 body[data-design="terminal"] .ph{font-family:'Consolas',monospace;text-transform:uppercase;letter-spacing:1px;border-bottom:1px dashed var(--gold);background:transparent}
 body[data-design="terminal"] #brand,body[data-design="terminal"] .item .tt,body[data-design="terminal"] #ed-text{font-family:'Consolas',monospace}
@@ -48,8 +67,13 @@ body[data-design="terminal"] .item{border-bottom:1px dashed var(--line)}
 body[data-design="terminal"]::after{content:'';position:fixed;inset:0;z-index:9998;pointer-events:none;
   background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0px,rgba(0,0,0,.16) 1px,transparent 1px,transparent 3px)}
 
-/* 📐 Neo-brutalista */
-body[data-design="brutal"] .panel{border:2px solid var(--gold);border-radius:0;box-shadow:5px 5px 0 var(--gold)}
+/* 📐 Neo-brutalista — feed a TODO lo ancho arriba, dos bloques grandes abajo */
+body[data-design="brutal"] #grid{grid-template-columns:1fr 1fr}
+body[data-design="brutal"] #p-stream{grid-column:1 / 3;order:1}
+body[data-design="brutal"] #col-left{grid-column:1;order:2}
+body[data-design="brutal"] #col-right{grid-column:2;order:3}
+body[data-design="brutal"] #stream{max-height:440px}
+body[data-design="brutal"] .panel{border:2px solid var(--gold);border-radius:0;box-shadow:6px 6px 0 var(--gold)}
 body[data-design="brutal"] .ph{background:var(--gold);color:var(--bg);border:none;font-weight:800;text-transform:uppercase;letter-spacing:1px}
 body[data-design="brutal"] .ph .grab,body[data-design="brutal"] .ph .r{color:var(--bg)}
 body[data-design="brutal"] #brand{letter-spacing:0;font-weight:800}

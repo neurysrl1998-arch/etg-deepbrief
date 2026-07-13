@@ -1,5 +1,5 @@
 {
-  "version": "3.7.0",
-  "notes": "🎨 5 diseños visuales seleccionables (Neón, Minimalista, Cristal, Terminal Retro, Neo-brutalista) combinables con los colores\n🧠 Análisis institucional por noticia (por qué importa, cadena de efectos, alcista/bajista, score de impacto NQ)\n🎯 Tesis macro del día · editorial IA con máquina de escribir · animaciones y críticos pulsantes",
-  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.7.0/ETG-DeepBrief.exe"
+  "version": "3.7.1",
+  "notes": "🎨 5 diseños con LAYOUT completo distinto (no solo colores):\n• Editorial (3 columnas clásico)\n• Futurista Neón (feed ancho + rail)\n• Minimalista (columna única, modo lectura)\n• Cristal (rail izquierdo + feed, vidrio)\n• Terminal Retro (dashboard a lo ancho + CRT)\n• Neo-brutalista (feed full + bloques)\nCombinables con los 5 colores. Incluye el análisis institucional por noticia.",
+  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.7.1/ETG-DeepBrief.exe"
 }
