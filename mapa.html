@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ETG WARMAP — Mapa Táctico en Vivo</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#07090c;--panel:#0d1117;--panel2:#131b24;--line:#20303f;--gold:#d4af37;--ivory:#e8eef4;--dim:#7d90a3;
+  --red:#ff3b3b;--orange:#ff8c1a;--yellow:#ffd23a;--green:#33d17a;--cyan:#37d7ff}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font:14px/1.4 'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ivory);overflow:hidden}
+#app{display:flex;height:100vh}
+#map{flex:1;background:#07090c}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+
+/* panel */
+#side{width:360px;flex:none;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+#head{padding:13px 16px;border-bottom:2px solid var(--red);background:linear-gradient(180deg,var(--panel2),var(--panel))}
+#head .t{font-family:Georgia,serif;font-size:21px;font-weight:bold;letter-spacing:1px;color:var(--gold)}
+#head .t b{color:var(--red)}
+#head .s{font-size:10px;letter-spacing:3px;color:var(--dim);margin-top:2px}
+#live{display:inline-flex;align-items:center;gap:6px;color:var(--red);font-size:10px;font-weight:800;letter-spacing:1px;margin-top:6px}
+#live .d{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--red)}50%{opacity:.35}}
+#stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.stat{background:var(--panel);padding:10px 12px}
+.stat .n{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.stat .l{font-size:9.5px;letter-spacing:1px;color:var(--dim);margin-top:3px;text-transform:uppercase}
+#body{flex:1;overflow-y:auto;padding:12px 14px}
+.sec{margin-bottom:16px}
+.sec .h{font-size:10.5px;font-weight:800;letter-spacing:2px;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sec .h .c{margin-left:auto;color:var(--gold);font-weight:700}
+
+/* aviso aviones cerca */
+#nearbox{background:linear-gradient(135deg,#1a0808,#241010);border:1px solid #4a1515;border-radius:9px;padding:10px 12px;margin-bottom:14px}
+#nearbox .th{color:var(--red);font-size:11px;font-weight:800;letter-spacing:1px;margin-bottom:7px}
+.nrow{display:flex;gap:8px;align-items:baseline;padding:3px 0;font-size:12px;border-bottom:1px dashed #331515;cursor:pointer}
+.nrow:last-child{border:none} .nrow:hover{color:var(--gold)}
+.nrow .cs{font-weight:700;font-variant-numeric:tabular-nums;min-width:58px}
+.nrow .z{margin-left:auto;color:var(--dim);font-size:11px}
+
+/* zonas */
+.zrow{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;margin-bottom:3px}
+.zrow:hover{background:var(--panel2)}
+.zbar{width:5px;align-self:stretch;border-radius:3px;flex:none}
+.zrow .zn{font-size:13px;font-weight:600} .zrow .zr{font-size:10.5px;color:var(--dim)}
+.zrow .zt{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums}
+.zrow .zt .v{font-weight:800;font-size:15px} .zrow .zt .c{font-size:9.5px;color:var(--dim)}
+
+/* toggles */
+#layers{display:flex;flex-direction:column;gap:7px}
+.lay{display:flex;align-items:center;gap:9px;font-size:12.5px;cursor:pointer;padding:5px 7px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)}
+.lay .sw{width:34px;height:18px;background:var(--line);border-radius:10px;position:relative;transition:.2s;flex:none}
+.lay .sw::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;background:var(--dim);top:2.5px;left:3px;transition:.2s}
+.lay.on .sw{background:var(--gold)} .lay.on .sw::after{left:18px;background:#07090c}
+.lay .dot{width:10px;height:10px;border-radius:50%;flex:none}
+.lay .cnt{margin-left:auto;color:var(--dim);font-size:11px;font-variant-numeric:tabular-nums}
+
+#foot{padding:8px 14px;border-top:1px solid var(--line);font-size:10.5px;color:var(--dim);display:flex;gap:12px;align-items:center}
+#foot .ok{color:var(--green)} #foot .bad{color:var(--red)}
+
+/* marcadores */
+.plane{transition:transform .4s linear}
+.plane svg{display:block;filter:drop-shadow(0 0 3px rgba(55,215,255,.85))}
+.plane svg path{fill:var(--cyan)}
+.plane.hot svg path{fill:var(--red)}
+.plane.hot svg{filter:drop-shadow(0 0 7px var(--red));animation:planeblink 1s infinite}
+@keyframes planeblink{50%{opacity:.55}}
+.zone-pulse{border-radius:50%;position:relative}
+.zone-pulse::before{content:'';position:absolute;inset:0;border-radius:50%;background:inherit;opacity:.5;animation:ring 1.8s infinite}
+@keyframes ring{0%{transform:scale(1);opacity:.6}100%{transform:scale(3.2);opacity:0}}
+
+/* 💥 bombardeo en zonas bajo ataque */
+.blast{width:90px;height:90px;position:relative;pointer-events:none}
+.blast span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.blast .ring{border:2.5px solid #ffb400;border-radius:50%;width:8px;height:8px;animation:blast 1.7s infinite ease-out}
+.blast .r2{animation-delay:.55s}.blast .r3{animation-delay:1.1s}
+@keyframes blast{0%{width:6px;height:6px;opacity:.95;border-color:#fff2a0}60%{border-color:#ff5a1a;opacity:.5}100%{width:86px;height:86px;opacity:0;border-color:#ff3b3b}}
+.blast .core{width:13px;height:13px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffb400 45%,#ff3b3b 100%);
+  box-shadow:0 0 14px 5px rgba(255,90,26,.7);animation:core 1s infinite}
+@keyframes core{0%,100%{transform:translate(-50%,-50%) scale(.6);opacity:.75}50%{transform:translate(-50%,-50%) scale(1.5);opacity:1}}
+.blast .boom{font-size:26px;filter:drop-shadow(0 0 6px #ff5a1a);animation:boom 2.6s infinite}
+@keyframes boom{0%,55%{opacity:0;transform:translate(-50%,-50%) scale(.3)}66%{opacity:1;transform:translate(-50%,-50%) scale(1.35)}82%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
+.attack-tag{background:rgba(180,10,10,.92);color:#fff;font-size:9px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:4px;white-space:nowrap;top:-16px;box-shadow:0 0 8px rgba(255,0,0,.5)}
+.leaflet-popup-content-wrapper{background:var(--panel);color:var(--ivory);border:1px solid var(--gold);border-radius:9px}
+.leaflet-popup-tip{background:var(--gold)}
+.leaflet-popup-content{margin:11px 13px;font-size:12.5px}
+.pop h4{color:var(--gold);font-size:14px;margin-bottom:3px} .pop .pm{color:var(--dim);font-size:11px;margin-bottom:6px}
+.pop li{list-style:none;padding:3px 0;border-top:1px solid var(--line);line-height:1.35}
+.pop .sev2{color:var(--red);font-weight:700} .pop .sev1{color:var(--orange)}
+.pop a{color:var(--ivory);text-decoration:none} .pop a:hover{color:var(--gold)}
+.leaflet-bar a{background:var(--panel);color:var(--ivory);border-color:var(--line)}
+.leaflet-control-attribution{background:rgba(7,9,12,.7)!important;color:#5a6b7a!important}
+.leaflet-control-attribution a{color:#7d90a3!important}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map"></div>
+  <div id="side">
+    <div id="head">
+      <div class="t">ETG <b>WARMAP</b></div>
+      <div class="s">MAPA TÁCTICO DE CONFLICTOS · TIEMPO REAL</div>
+      <div id="live"><span class="d"></span>EN VIVO · <span id="clock">--:--:--</span></div>
+    </div>
+    <div id="stats">
+      <div class="stat"><div class="n" id="s-ac" style="color:var(--cyan)">—</div><div class="l">✈ Aeronaves militares</div></div>
+      <div class="stat"><div class="n" id="s-near" style="color:var(--red)">—</div><div class="l">🎯 Sobre zonas activas</div></div>
+      <div class="stat"><div class="n" id="s-zones" style="color:var(--orange)">—</div><div class="l">🔥 Zonas en conflicto</div></div>
+      <div class="stat"><div class="n" id="s-quakes" style="color:var(--yellow)">—</div><div class="l">🌐 Sismos 24h</div></div>
+    </div>
+    <div id="body">
+      <div id="nearbox" style="display:none">
+        <div class="th">🎯 AERONAVES MILITARES SOBRE/CERCA DE ZONAS CALIENTES</div>
+        <div id="nearlist"></div>
+      </div>
+      <div class="sec">
+        <div class="h">🔥 ZONAS POR NIVEL DE AMENAZA <span class="c" id="zc"></span></div>
+        <div id="zones">Cargando zonas…</div>
+      </div>
+      <div class="sec">
+        <div class="h">🛰️ CAPAS DEL MAPA</div>
+        <div id="layers">
+          <div class="lay on" data-l="ac"><span class="dot" style="background:var(--cyan)"></span>Aeronaves militares<span class="cnt" id="c-ac">0</span><span class="sw"></span></div>
+          <div class="lay on" data-l="zn"><span class="dot" style="background:var(--red)"></span>Zonas de conflicto<span class="cnt" id="c-zn">0</span><span class="sw"></span></div>
+          <div class="lay on" data-l="qk"><span class="dot" style="background:var(--yellow)"></span>Sismos (M≥2.5)<span class="cnt" id="c-qk">0</span><span class="sw"></span></div>
+        </div>
+      </div>
+    </div>
+    <div id="foot">
+      <span id="st-adsb">✈ —</span><span id="st-news">🔥 —</span><span id="st-quakes">🌐 —</span>
+    </div>
+  </div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const map=L.map('map',{zoomControl:true,worldCopyJump:true,minZoom:2}).setView([28,35],4);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  attribution:'© OpenStreetMap · © CARTO · aviones adsb.lol · sismos USGS',subdomains:'abcd',maxZoom:18}).addTo(map);
+
+const L_ac=L.layerGroup().addTo(map), L_zn=L.layerGroup().addTo(map), L_qk=L.layerGroup().addTo(map);
+const on={ac:true,zn:true,qk:true};
+const threatColor=t=>t>=70?'#ff3b3b':t>=45?'#ff8c1a':t>=22?'#ffd23a':'#33d17a';
+const esc=t=>{const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML};
+
+const PLANE_SVG='<svg viewBox="0 0 24 24" width="22" height="22"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16z"/></svg>';
+function planeIcon(a,hot){
+  return L.divIcon({className:'',iconSize:[22,22],iconAnchor:[11,11],
+    html:`<div class="plane${hot?' hot':''}" style="transform:rotate(${(a.trk||0)}deg)">${PLANE_SVG}</div>`});
+}
+function blastIcon(){
+  return L.divIcon({className:'',iconSize:[90,90],iconAnchor:[45,45],
+    html:'<div class="blast"><span class="ring"></span><span class="ring r2"></span><span class="ring r3"></span><span class="core"></span><span class="boom">💥</span></div>'});
+}
+let nearHexes=new Set();
+function drawAircraft(list){
+  L_ac.clearLayers();$('#c-ac').textContent=list.length;
+  list.forEach(a=>{
+    const hot=nearHexes.has(a.hex);
+    const m=L.marker([a.lat,a.lon],{icon:planeIcon(a,hot),zIndexOffset:hot?1000:0});
+    const altk=a.alt?(Math.round(a.alt/100)*100).toLocaleString()+' ft':'—';
+    m.bindPopup(`<div class="pop"><h4>${a.flag} ${esc(a.call)}</h4>
+      <div class="pm">${esc(a.cty)} · ${esc(a.type)}${a.reg?' · '+esc(a.reg):''}</div>
+      Altitud: <b>${altk}</b><br>Velocidad: <b>${a.spd} kt</b> · Rumbo: <b>${Math.round(a.trk)}°</b>
+      ${hot?'<br><span class="sev2">⚠ Cerca de zona de conflicto</span>':''}</div>`);
+    L_ac.addLayer(m);
+  });
+}
+function drawZones(list){
+  L_zn.clearLayers();$('#c-zn').textContent=list.length;
+  list.forEach(z=>{
+    const col=threatColor(z.threat), sz=14+Math.min(26,z.threat/3);
+    const underAttack=!!z.attack;
+    if(underAttack){
+      L_zn.addLayer(L.marker([z.lat,z.lon],{icon:blastIcon(),interactive:false,zIndexOffset:-500}));
+      L_zn.addLayer(L.marker([z.lat,z.lon],{icon:L.divIcon({className:'',iconSize:[0,0],
+        html:`<span class="attack-tag" style="position:absolute;transform:translate(-50%,0)">⚠ BAJO ATAQUE</span>`}),interactive:false}));
+    }
+    const ic=L.divIcon({className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],
+      html:`<div class="zone-pulse" style="width:${sz}px;height:${sz}px;background:${col};border:2px solid #fff3"></div>`});
+    const m=L.marker([z.lat,z.lon],{icon:ic});
+    const heads=z.heads.map(h=>`<li class="${h.sev==2?'sev2':h.sev==1?'sev1':''}">${esc(h.title)} <span style="color:var(--dim)">— ${esc(h.src)}</span></li>`).join('')||'<li style="color:var(--dim)">Sin titulares recientes</li>';
+    m.bindPopup(`<div class="pop"><h4 style="color:${col}">${esc(z.name)} · ${z.label}</h4>
+      <div class="pm">${esc(z.region)} · amenaza ${z.threat}/100 · ${z.count} titulares 24h</div>
+      <ul>${heads}</ul></div>`,{maxWidth:340});
+    L_zn.addLayer(m);
+  });
+}
+function drawQuakes(list){
+  L_qk.clearLayers();$('#c-qk').textContent=list.length;
+  list.forEach(q=>{
+    const c=L.circleMarker([q.lat,q.lon],{radius:2+q.mag*1.6,color:q.mag>=5?'#ff3b3b':'#ffd23a',
+      weight:1,fillOpacity:.25,opacity:.8});
+    c.bindPopup(`<div class="pop"><h4 style="color:var(--yellow)">Sismo M${q.mag}</h4><div class="pm">${esc(q.place)}</div></div>`);
+    L_qk.addLayer(c);
+  });
+}
+
+async function loadAircraft(){try{const r=await fetch('/api/aircraft');drawAircraft(await r.json())}catch(e){}}
+async function loadZones(){try{
+  const z=await(await fetch('/api/zones')).json();
+  drawZones(z);
+  const atk=z.filter(x=>x.attack).length;
+  $('#zc').innerHTML=atk?`<span style="color:var(--red)">⚔ ${atk} bajo ataque</span> · ${z.length}`:z.length;
+  $('#zones').innerHTML=z.map((x,i)=>`<div class="zrow" data-lat="${x.lat}" data-lon="${x.lon}">
+    <div class="zbar" style="background:${threatColor(x.threat)}"></div>
+    <div><div class="zn">${esc(x.name)}</div><div class="zr">${esc(x.region)}</div></div>
+    <div class="zt"><div class="v" style="color:${threatColor(x.threat)}">${x.threat}</div><div class="c">${x.count} noticias</div></div></div>`).join('');
+  document.querySelectorAll('.zrow').forEach(r=>r.onclick=()=>map.flyTo([+r.dataset.lat,+r.dataset.lon],6,{duration:1.2}));
+}catch(e){}}
+async function loadQuakes(){try{const r=await fetch('/api/quakes');drawQuakes(await r.json())}catch(e){}}
+async function loadStats(){try{
+  const s=await(await fetch('/api/stats')).json();
+  $('#s-ac').textContent=s.aircraft;$('#s-near').textContent=s.near_count;
+  $('#s-zones').textContent=s.zones_active;$('#s-quakes').textContent=s.quakes;
+  nearHexes=new Set((s.near||[]).map(a=>a.hex));
+  const nb=$('#nearbox');
+  if(s.near&&s.near.length){nb.style.display='block';
+    $('#nearlist').innerHTML=s.near.map(a=>`<div class="nrow" data-lat="${a.lat}" data-lon="${a.lon}">
+      <span class="cs">${a.flag} ${esc(a.call)}</span><span>${esc(a.type)}</span>
+      <span class="z">${esc(a.near)} · ${a.dist} km</span></div>`).join('');
+    document.querySelectorAll('.nrow').forEach(r=>r.onclick=()=>map.flyTo([+r.dataset.lat,+r.dataset.lon],7,{duration:1.2}));
+  }else nb.style.display='none';
+  const S=s.status||{};
+  const fmt=(v)=>v&&v.startsWith('OK')?`<span class="ok">●</span>`:`<span class="bad">●</span>`;
+  $('#st-adsb').innerHTML=`${fmt(S.adsb)} ✈ adsb.lol`;
+  $('#st-news').innerHTML=`${fmt(S.news)} 🔥 noticias`;
+  $('#st-quakes').innerHTML=`${fmt(S.quakes)} 🌐 USGS`;
+  $('#clock').textContent=s.updated;
+}catch(e){}}
+
+document.querySelectorAll('.lay').forEach(l=>l.onclick=()=>{
+  const k=l.dataset.l;on[k]=!on[k];l.classList.toggle('on',on[k]);
+  const g={ac:L_ac,zn:L_zn,qk:L_qk}[k];
+  if(on[k])g.addTo(map);else map.removeLayer(g);
+});
+function clock(){$('#clock').textContent=new Date().toLocaleTimeString('es')}
+setInterval(clock,1000);
+loadStats();loadAircraft();loadZones();loadQuakes();
+/* reintentos tempranos: las zonas/noticias tardan unos segundos en llegar al arrancar */
+[3000,8000,16000,28000].forEach(t=>setTimeout(()=>{loadZones();loadStats();loadQuakes();},t));
+setInterval(loadAircraft,15000);
+setInterval(loadStats,15000);
+setInterval(loadZones,45000);
+setInterval(loadQuakes,120000);
+</script>
+</body>
+</html>

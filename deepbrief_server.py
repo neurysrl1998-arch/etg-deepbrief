@@ -32,7 +32,7 @@ POLL_META_SEC   = 300    # calendario + fear&greed
 MAX_ITEMS       = 900
 KEEP_HOURS      = 48
 
-APP_VERSION = "3.3.0"
+APP_VERSION = "3.4.0"
 GH_REPO     = "neurysrl1998-arch/etg-deepbrief"
 RAW_VERSION_URL = f"https://raw.githubusercontent.com/{GH_REPO}/main/version.json"
 
@@ -560,8 +560,191 @@ def tension():
     else: label = "NORMAL"
     return {"value": val, "label": label, "criticos": crit, "altos": alto}
 
+# ================================================================== 🗺️ MAPA DE GUERRA (integrado)
+import math as _math
+from urllib.parse import quote as _quote
+
+def wq(q):
+    return f"https://news.google.com/rss/search?q={_quote(q + ' when:1d')}&hl=en-US&gl=US&ceid=US:en"
+
+WZONES = [
+    ("Ucrania", 50.45, 30.52, "Ucrania · Kyiv", "Ukraine (strike OR missile OR offensive OR front)"),
+    ("Gaza", 31.50, 34.47, "Gaza", "Gaza (airstrike OR strike OR ceasefire OR IDF)"),
+    ("Israel", 32.08, 34.78, "Israel · Tel Aviv", "Israel (rocket OR strike OR Hezbollah OR attack)"),
+    ("Líbano", 33.89, 35.50, "Líbano · Beirut", "Lebanon (Israel OR Hezbollah OR strike OR border)"),
+    ("Estrecho de Ormuz", 26.57, 56.25, "Irán · Ormuz", '"Strait of Hormuz" OR Iran (attack OR strike OR tanker OR closure)'),
+    ("Siria", 33.51, 36.29, "Siria · Damasco", "Syria (strike OR clashes OR attack OR militia)"),
+    ("Mar Rojo / Yemen", 15.35, 42.60, "Yemen · Houthi", "(Red Sea OR Yemen OR Houthi) (attack OR missile OR ship OR drone)"),
+    ("Sudán", 15.50, 32.56, "Sudán · Jartum", "Sudan (RSF OR clashes OR attack OR offensive)"),
+    ("Estrecho de Taiwán", 24.00, 119.5, "Taiwán", "Taiwan (China OR incursion OR military OR PLA OR jets)"),
+    ("Cachemira", 34.08, 74.80, "India–Pakistán", "Kashmir (attack OR clashes OR militants OR border)"),
+    ("Sahel", 16.77, -3.00, "Mali · Sahel", "(Mali OR Sahel OR Burkina Faso) (attack OR jihadist OR militants)"),
+    ("R.D. Congo", -1.68, 29.22, "RDC · Goma", '"DR Congo" OR M23 (clashes OR offensive OR attack)'),
+    ("Myanmar", 21.97, 96.08, "Myanmar", "Myanmar (junta OR clashes OR airstrike OR rebels)"),
+    ("Corea", 37.97, 126.7, "Península de Corea", '"North Korea" (missile OR provocation OR military OR border)'),
+]
+WSEV = re.compile(r'\b(strike|strikes|airstrike|missile|missiles|drone|shell|shelling|attack|attacked|offensive|killed|dead|casualties|explosion|bomb|invasion|escalat|troops|warship|clash|clashes|fighting)\b', re.I)
+WCRIT = re.compile(r'\b(invasion|declares? war|nuclear|massacre|major offensive|ground assault|full-scale|direct attack)\b', re.I)
+HEX_RANGES = [
+    (0xA00000, 0xAFFFFF, "🇺🇸", "EE.UU."), (0x400000, 0x43FFFF, "🇬🇧", "R. Unido"),
+    (0x140000, 0x1BFFFF, "🇷🇺", "Rusia"), (0x780000, 0x7BFFFF, "🇨🇳", "China"),
+    (0x738000, 0x73FFFF, "🇮🇱", "Israel"), (0x380000, 0x3BFFFF, "🇫🇷", "Francia"),
+    (0x3C0000, 0x3FFFFF, "🇩🇪", "Alemania"), (0x300000, 0x33FFFF, "🇮🇹", "Italia"),
+    (0x340000, 0x37FFFF, "🇪🇸", "España"), (0x710000, 0x717FFF, "🇸🇦", "A. Saudí"),
+    (0x750000, 0x757FFF, "🇮🇳", "India"), (0x760000, 0x767FFF, "🇮🇳", "India"),
+    (0x898000, 0x8993FF, "🇹🇼", "Taiwán"), (0x718000, 0x71FFFF, "🇰🇷", "Corea S."),
+    (0x728000, 0x72FFFF, "🇹🇷", "Turquía"), (0xC00000, 0xC3FFFF, "🇨🇦", "Canadá"),
+    (0x7C0000, 0x7FFFFF, "🇦🇺", "Australia"), (0x0A0000, 0x0A7FFF, "🇪🇬", "Egipto"),
+]
+def country_from_hex(hx):
+    try:
+        n = int(hx, 16)
+    except Exception:
+        return ("🏳️", "—")
+    for lo, hi, flag, name in HEX_RANGES:
+        if lo <= n <= hi:
+            return (flag, name)
+    return ("🏳️", "—")
+def w_haversine(a, b, c, d):
+    p1, p2 = _math.radians(a), _math.radians(c)
+    dp = _math.radians(c - a); dl = _math.radians(d - b)
+    x = _math.sin(dp/2)**2 + _math.cos(p1)*_math.cos(p2)*_math.sin(dl/2)**2
+    return 6371 * 2 * _math.atan2(_math.sqrt(x), _math.sqrt(1-x))
+
+WLOCK = threading.Lock()
+W_AIRCRAFT, W_ZONES, W_QUAKES = [], [], []
+WSTATUS = {"adsb": "…", "quakes": "…", "news": "…"}
+W_STARTED = [0.0]; W_ON = [False]
+
+def w_fetch_aircraft():
+    global W_AIRCRAFT
+    try:
+        j = requests.get("https://api.adsb.lol/v2/mil", headers=UA, timeout=20).json()
+        out = []
+        for a in j.get("ac", []):
+            lat, lon = a.get("lat"), a.get("lon")
+            if lat is None or lon is None: continue
+            flag, cty = country_from_hex(a.get("hex", ""))
+            call = re.sub(r'[^A-Za-z0-9\-]', '', a.get("flight") or "").strip() or (a.get("r") or a.get("hex") or "—").upper()
+            out.append({"hex": a.get("hex", ""), "call": call, "type": a.get("t") or "—",
+                        "lat": lat, "lon": lon, "alt": a.get("alt_baro") if isinstance(a.get("alt_baro"), (int, float)) else 0,
+                        "spd": round(a.get("gs") or 0), "trk": a.get("track") or a.get("true_heading") or 0,
+                        "flag": flag, "cty": cty, "reg": a.get("r") or ""})
+        with WLOCK: W_AIRCRAFT = out
+        WSTATUS["adsb"] = f"OK · {len(out)}"
+    except Exception as ex:
+        WSTATUS["adsb"] = "error: " + str(ex)[:50]
+
+def w_fetch_quakes():
+    global W_QUAKES
+    try:
+        j = requests.get("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson", headers=UA, timeout=18).json()
+        out = []
+        for f in j.get("features", []):
+            g = f.get("geometry", {}).get("coordinates") or [None, None]
+            p = f.get("properties", {})
+            if g[0] is None or (p.get("mag") or 0) < 2.5: continue
+            out.append({"lat": g[1], "lon": g[0], "mag": round(p.get("mag") or 0, 1), "place": p.get("place") or "—"})
+        with WLOCK: W_QUAKES = out
+        WSTATUS["quakes"] = f"OK · {len(out)}"
+    except Exception as ex:
+        WSTATUS["quakes"] = "error: " + str(ex)[:50]
+
+def w_fetch_zone(z):
+    name, lat, lon, region, query = z
+    heads, score = [], 0
+    try:
+        fp = feedparser.parse(requests.get(wq(query), headers=UA, timeout=12).content)
+        now = time.time()
+        for e in fp.entries[:40]:
+            title = re.sub(r'\s+', ' ', e.get("title", "")); src = ""
+            m = re.match(r'^(.*)\s-\s([^-]{2,40})$', title)
+            if m: title, src = m.group(1), m.group(2)
+            ts = None
+            v = e.get("published_parsed") or e.get("updated_parsed")
+            if v: ts = datetime(*v[:6], tzinfo=UTC).timestamp()
+            if ts and now - ts > 86400: continue
+            sev = 2 if WCRIT.search(title) else (1 if WSEV.search(title) else 0)
+            score += 2 + sev * 3
+            heads.append({"title": title, "src": src, "ts": ts or now, "sev": sev})
+        heads.sort(key=lambda h: (h["sev"], h["ts"]), reverse=True)
+    except Exception:
+        pass
+    threat = min(100, score)
+    label = "CRÍTICA" if threat >= 70 else "ALTA" if threat >= 45 else "ELEVADA" if threat >= 22 else "BAJA"
+    attack = threat >= 45 and any(h["sev"] >= 1 for h in heads[:4])
+    return {"name": name, "lat": lat, "lon": lon, "region": region, "count": len(heads),
+            "threat": threat, "label": label, "attack": attack, "heads": heads[:6]}
+
+def w_fetch_zones():
+    global W_ZONES
+    try:
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            res = list(ex.map(w_fetch_zone, WZONES))
+        res.sort(key=lambda z: z["threat"], reverse=True)
+        with WLOCK: W_ZONES = res
+        WSTATUS["news"] = f"OK · {sum(z['count'] for z in res)} titulares"
+    except Exception as ex:
+        WSTATUS["news"] = "error: " + str(ex)[:50]
+
+def w_near(radius_km=300):
+    with WLOCK:
+        acs = list(W_AIRCRAFT); zones = [z for z in W_ZONES if z["threat"] >= 22]
+    flagged = []
+    for a in acs:
+        for z in zones:
+            d = w_haversine(a["lat"], a["lon"], z["lat"], z["lon"])
+            if d <= radius_km:
+                flagged.append({**a, "near": z["name"], "dist": round(d)}); break
+    flagged.sort(key=lambda x: x["dist"])
+    return flagged
+
+def ensure_war():
+    if W_ON[0]: return
+    W_ON[0] = True; W_STARTED[0] = time.time()
+    def loop(fn, sec):
+        while True:
+            fn(); time.sleep(sec)
+    w_fetch_aircraft()
+    threading.Thread(target=loop, args=(w_fetch_aircraft, 15), daemon=True).start()
+    threading.Thread(target=loop, args=(w_fetch_zones, 300), daemon=True).start()
+    threading.Thread(target=loop, args=(w_fetch_quakes, 300), daemon=True).start()
+
 # ------------------------------------------------------------------ flask
 app = Flask(__name__, static_folder=None)
+
+@app.get("/mapa")
+def mapa():
+    ensure_war()
+    return send_from_directory(APP_DIR, "mapa.html")
+
+@app.get("/api/aircraft")
+def w_api_aircraft():
+    ensure_war()
+    with WLOCK: return jsonify(W_AIRCRAFT)
+
+@app.get("/api/zones")
+def w_api_zones():
+    ensure_war()
+    with WLOCK: return jsonify(W_ZONES)
+
+@app.get("/api/quakes")
+def w_api_quakes():
+    ensure_war()
+    with WLOCK: return jsonify(W_QUAKES)
+
+@app.get("/api/stats")
+def w_api_stats():
+    ensure_war()
+    near = w_near()
+    with WLOCK:
+        ac, zn, qk = len(W_AIRCRAFT), list(W_ZONES), len(W_QUAKES)
+    top = zn[0] if zn else None
+    return jsonify({"aircraft": ac, "zones_active": sum(1 for z in zn if z["threat"] >= 22),
+                    "quakes": qk, "near": near[:12], "near_count": len(near),
+                    "top_zone": {"name": top["name"], "threat": top["threat"], "label": top["label"]} if top else None,
+                    "status": WSTATUS, "uptime": int(time.time() - W_STARTED[0]),
+                    "updated": datetime.now().strftime("%H:%M:%S")})
 
 @app.get("/")
 def index():

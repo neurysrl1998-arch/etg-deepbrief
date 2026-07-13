@@ -1,5 +1,5 @@
 {
-  "version": "3.3.0",
-  "notes": "• VXN (Nasdaq-100) en el panel de volatilidad\n• Editorial IA + chat 'Pregúntale al mercado' (Llama local)\n• Barra superior rediseñada (no se comprime)\n• Configuración con scroll (ya no se corta en monitores ultrawide)\n• Actualización automática desde GitHub",
-  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.3.0/ETG-DeepBrief.exe"
+  "version": "3.4.0",
+  "notes": "🗺️ NUEVO: Mapa de guerra en vivo integrado (botón 🗺️)\n• Aviones militares reales con forma y rumbo\n• Animaciones de bombardeo en zonas bajo ataque\n• Zonas de conflicto, sismos y noticias en tiempo real\n• VXN Nasdaq-100, editorial IA y chat, barra rediseñada",
+  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.4.0/ETG-DeepBrief.exe"
 }

@@ -264,6 +264,17 @@ body.alarm::before{content:'';position:fixed;inset:0;pointer-events:none;z-index
 #chatsend:disabled{opacity:.5;cursor:default}
 #chatnote{font-size:9.5px;color:var(--dim);text-align:center;padding:0 0 8px}
 
+/* ---- 🗺️ mapa de guerra (overlay a pantalla completa) ---- */
+#mapwrap{display:none;position:fixed;inset:0;z-index:130;background:#07090c}
+#mapbar{position:absolute;top:0;left:0;right:0;height:46px;background:linear-gradient(180deg,#0d1117,rgba(13,17,23,.85));
+  border-bottom:2px solid var(--red);display:flex;align-items:center;gap:12px;padding:0 16px;z-index:2}
+#mapbar .t{font-family:Georgia,serif;color:var(--gold);font-size:17px;font-weight:bold;letter-spacing:1px}
+#mapbar .t b{color:var(--red)}
+#mapbar .badge{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--red);border:1px solid var(--red);border-radius:5px;padding:2px 8px;animation:pulse 1.2s infinite}
+#mapbar .x{margin-left:auto;cursor:pointer;color:var(--dim);font-size:14px;font-weight:700;border:1px solid var(--line);border-radius:7px;padding:5px 13px}
+#mapbar .x:hover{color:var(--gold);border-color:var(--gold)}
+#mapframe{position:absolute;top:46px;left:0;right:0;bottom:0;width:100%;height:calc(100% - 46px);border:0;background:#07090c}
+
 /* ---- status ---- */
 #statusbar{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--line);
   display:flex;gap:26px;padding:5px 22px;font-size:11px;color:var(--dim);z-index:9}
@@ -286,6 +297,7 @@ body.alarm::before{content:'';position:fixed;inset:0;pointer-events:none;z-index
     <div id="session"><div class="st">—</div><div class="cd"></div></div>
     <div id="nyclock"><div class="t">--:--:--</div><div class="s">NUEVA YORK</div></div>
     <div id="btncluster">
+      <button id="mapbtn" class="mbtn" title="Mapa de guerra en vivo">🗺️</button>
       <button id="chatbtn" class="mbtn" title="Pregúntale al mercado (IA)">💬</button>
       <button id="gapbtn" class="mbtn" title="Informe Pre-Apertura / Gap del Domingo">🌅</button>
       <button id="langbtn" class="mbtn" title="Traducir titulares al español">🌐 EN</button>
@@ -393,6 +405,14 @@ body.alarm::before{content:'';position:fixed;inset:0;pointer-events:none;z-index
     <div class="gh">🌅 INFORME PRE-APERTURA <span style="font-size:12px;color:var(--dim);margin-left:12px" id="gapsince"></span><span class="x" id="gapclose">✕</span></div>
     <div class="gb" id="gapbody">Generando informe…</div>
   </div>
+</div>
+
+<!-- MAPA DE GUERRA (overlay) -->
+<div id="mapwrap">
+  <div id="mapbar"><span class="t">🗺️ ETG <b>WARMAP</b></span><span class="badge">● EN VIVO</span>
+    <span style="font-size:11px;color:var(--dim)">Aviones militares reales · zonas bajo ataque · sismos</span>
+    <span class="x" id="mapclose">✕ Cerrar mapa</span></div>
+  <iframe id="mapframe" title="Mapa de guerra en vivo"></iframe>
 </div>
 
 <!-- CHAT: PREGÚNTALE AL MERCADO -->
@@ -891,8 +911,13 @@ $('#watchin').onkeydown=async e=>{if(e.key==='Enter'&&e.target.value.trim()){
   await fetch('/api/watch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({term:e.target.value.trim()})});
   e.target.value='';loadMeta()}};
 
+/* ---------- 🗺️ mapa de guerra ---------- */
+function closeMap(){$('#mapwrap').style.display='none';$('#mapframe').src='about:blank'}
+$('#mapbtn').onclick=()=>{$('#mapframe').src='/mapa';$('#mapwrap').style.display='block'};
+$('#mapclose').onclick=closeMap;
+
 /* ---------- cerrar modales con Escape ---------- */
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#gapwrap').style.display='none';$('#cfgwrap').style.display='none';$('#chatwrap').style.display='none'}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#gapwrap').style.display='none';$('#cfgwrap').style.display='none';$('#chatwrap').style.display='none';closeMap()}});
 
 /* ---------- informe pre-apertura ---------- */
 async function openGap(){
