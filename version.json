@@ -1,5 +1,5 @@
 {
-  "version": "3.4.0",
-  "notes": "🗺️ NUEVO: Mapa de guerra en vivo integrado (botón 🗺️)\n• Aviones militares reales con forma y rumbo\n• Animaciones de bombardeo en zonas bajo ataque\n• Zonas de conflicto, sismos y noticias en tiempo real\n• VXN Nasdaq-100, editorial IA y chat, barra rediseñada",
-  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.4.0/ETG-DeepBrief.exe"
+  "version": "3.5.0",
+  "notes": "🎮 Mapa de guerra estilo videojuego\n• Explosiones, misiles y aviones atacando en tiempo real\n• Combate animado en zonas bajo ataque\n• Detector pre-ataque (cisternas/AWACS/bombarderos)\n• Estrecho de Ormuz + barcos en vivo (con clave AIS gratuita)\n• Aviones militares reales con forma y rumbo",
+  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.5.0/ETG-DeepBrief.exe"
 }

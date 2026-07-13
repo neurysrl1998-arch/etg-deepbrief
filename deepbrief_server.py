@@ -32,7 +32,7 @@ POLL_META_SEC   = 300    # calendario + fear&greed
 MAX_ITEMS       = 900
 KEEP_HOURS      = 48
 
-APP_VERSION = "3.4.0"
+APP_VERSION = "3.5.0"
 GH_REPO     = "neurysrl1998-arch/etg-deepbrief"
 RAW_VERSION_URL = f"https://raw.githubusercontent.com/{GH_REPO}/main/version.json"
 
@@ -131,10 +131,10 @@ def load_settings():
         with open(SETTINGS_FILE, encoding="utf-8") as f:
             s = json.load(f)
             s.setdefault("watch", []); s.setdefault("lang", "en")
-            s.setdefault("win_toast", True); s.setdefault("llama_url", "")
+            s.setdefault("win_toast", True); s.setdefault("llama_url", ""); s.setdefault("ais_key", "")
             return s
     except Exception:
-        return {"watch": [], "lang": "en", "win_toast": True, "llama_url": ""}
+        return {"watch": [], "lang": "en", "win_toast": True, "llama_url": "", "ais_key": ""}
 SETTINGS = load_settings()
 TRANS = {}   # caché de traducciones id -> título en español
 
@@ -605,6 +605,19 @@ def country_from_hex(hx):
         if lo <= n <= hi:
             return (flag, name)
     return ("🏳️", "—")
+def classify_type(t):
+    t = (t or "").upper()
+    def has(*xs): return any(x in t for x in xs)
+    if has("K35", "KC10", "KDC", "KC46", "K46", "VOYA", "KC30", "A310M"): return ("tanker", "🛢️ Cisterna", True)
+    if has("E3TF", "E3CF", "E767", "A50", "KJ2", "KJ5"): return ("awacs", "📡 AWACS", True)
+    if has("R135", "RC13", "RIVET", "U2", "EP3", "E6", "P8", "P3", "RC26", "E8"): return ("isr", "🛰️ Inteligencia", True)
+    if has("B52", "B1B", "TU95", "TU160", "TU22", "TU16"): return ("bomber", "💣 Bombardero", True)
+    if has("Q4", "MQ9", "MQ1", "RQ4", "RPA", "REAP"): return ("drone", "🛸 Dron", True)
+    if has("F16", "F15", "F18", "F22", "F35", "EUFI", "TYP", "RFAL", "MIG", "SU2", "SU3", "SU5", "J10", "J11", "J20", "GRIP", "JAS", "F5", "F4", "A10"): return ("fighter", "✈️ Caza", False)
+    if has("C130", "C30", "C17", "A400", "C5M", "IL76", "AN12", "AN26", "A124"): return ("transport", "📦 Transporte", False)
+    if has("H60", "H47", "H64", "MI8", "MI17", "MI24", "UH", "AH", "CH", "EC", "AS5", "H1"): return ("heli", "🚁 Helicóptero", False)
+    return ("other", "militar", False)
+
 def w_haversine(a, b, c, d):
     p1, p2 = _math.radians(a), _math.radians(c)
     dp = _math.radians(c - a); dl = _math.radians(d - b)
@@ -626,10 +639,12 @@ def w_fetch_aircraft():
             if lat is None or lon is None: continue
             flag, cty = country_from_hex(a.get("hex", ""))
             call = re.sub(r'[^A-Za-z0-9\-]', '', a.get("flight") or "").strip() or (a.get("r") or a.get("hex") or "—").upper()
+            acat, klabel, notable = classify_type(a.get("t"))
             out.append({"hex": a.get("hex", ""), "call": call, "type": a.get("t") or "—",
                         "lat": lat, "lon": lon, "alt": a.get("alt_baro") if isinstance(a.get("alt_baro"), (int, float)) else 0,
                         "spd": round(a.get("gs") or 0), "trk": a.get("track") or a.get("true_heading") or 0,
-                        "flag": flag, "cty": cty, "reg": a.get("r") or ""})
+                        "flag": flag, "cty": cty, "reg": a.get("r") or "",
+                        "acat": acat, "klabel": klabel, "notable": notable})
         with WLOCK: W_AIRCRAFT = out
         WSTATUS["adsb"] = f"OK · {len(out)}"
     except Exception as ex:
@@ -699,6 +714,57 @@ def w_near(radius_km=300):
     flagged.sort(key=lambda x: x["dist"])
     return flagged
 
+W_CAT_WEIGHT = {"bomber": 4, "tanker": 3, "awacs": 3, "isr": 3, "drone": 2, "fighter": 2}
+
+def w_military_buildup(radius_km=350):
+    with WLOCK:
+        acs = list(W_AIRCRAFT); zones = [z for z in W_ZONES if z["threat"] >= 22]
+    out = []
+    for z in zones:
+        near = [a for a in acs if w_haversine(a["lat"], a["lon"], z["lat"], z["lon"]) <= radius_km]
+        if not near: continue
+        notable = [a for a in near if a.get("notable")]
+        score = sum(W_CAT_WEIGHT.get(a.get("acat"), 1) for a in near)
+        kinds = {}
+        for a in notable: kinds[a["klabel"]] = kinds.get(a["klabel"], 0) + 1
+        level = "INUSUAL" if (len(notable) >= 2 or score >= 12) else "ELEVADA" if (notable or score >= 6) else "NORMAL"
+        if level == "NORMAL" and len(near) < 3: continue
+        out.append({"zone": z["name"], "lat": z["lat"], "lon": z["lon"], "count": len(near),
+                    "notable": len(notable), "kinds": kinds, "score": score, "level": level})
+    out.sort(key=lambda x: (x["level"] == "INUSUAL", x["score"]), reverse=True)
+    return out
+
+# 🚢 barcos AIS (Estrecho de Ormuz) — requiere clave gratuita de aisstream.io
+W_SHIPS = {}
+W_SHIP_ON = [False]
+
+def ais_key():
+    return (SETTINGS.get("ais_key") or os.environ.get("ETG_AIS_KEY", "")).strip()
+
+def w_ais_loop():
+    while True:
+        key = ais_key()
+        if not key:
+            time.sleep(12); continue
+        try:
+            import websocket
+            ws = websocket.create_connection("wss://stream.aisstream.io/v0/stream", timeout=25)
+            ws.send(json.dumps({"APIKey": key, "BoundingBoxes": [[[24.0, 54.0], [27.6, 58.6]]],
+                                "FilterMessageTypes": ["PositionReport"]}))
+            W_SHIP_ON[0] = True
+            while True:
+                msg = json.loads(ws.recv())
+                md = msg.get("MetaData", {}) or {}
+                pr = (msg.get("Message", {}) or {}).get("PositionReport", {}) or {}
+                mmsi = md.get("MMSI"); lat = md.get("latitude", pr.get("Latitude")); lon = md.get("longitude", pr.get("Longitude"))
+                if mmsi is None or lat is None or lon is None: continue
+                sog = pr.get("Sog")
+                W_SHIPS[mmsi] = {"lat": lat, "lon": lon, "name": (md.get("ShipName") or "").strip() or "Barco",
+                                 "speed": sog, "course": pr.get("Cog") or 0,
+                                 "stopped": (sog is not None and sog < 0.5), "t": time.time()}
+        except Exception:
+            W_SHIP_ON[0] = False; time.sleep(15)
+
 def ensure_war():
     if W_ON[0]: return
     W_ON[0] = True; W_STARTED[0] = time.time()
@@ -709,6 +775,7 @@ def ensure_war():
     threading.Thread(target=loop, args=(w_fetch_aircraft, 15), daemon=True).start()
     threading.Thread(target=loop, args=(w_fetch_zones, 300), daemon=True).start()
     threading.Thread(target=loop, args=(w_fetch_quakes, 300), daemon=True).start()
+    threading.Thread(target=w_ais_loop, daemon=True).start()
 
 # ------------------------------------------------------------------ flask
 app = Flask(__name__, static_folder=None)
@@ -733,6 +800,15 @@ def w_api_quakes():
     ensure_war()
     with WLOCK: return jsonify(W_QUAKES)
 
+@app.get("/api/ships")
+def w_api_ships():
+    ensure_war()
+    if not ais_key():
+        return jsonify({"ok": False, "msg": "necesita clave gratuita de aisstream.io (⚙️ Configuración → Barcos)"})
+    now = time.time()
+    ships = [v for v in list(W_SHIPS.values()) if now - v["t"] < 600]
+    return jsonify({"ok": True, "ships": ships, "connected": W_SHIP_ON[0]})
+
 @app.get("/api/stats")
 def w_api_stats():
     ensure_war()
@@ -740,8 +816,10 @@ def w_api_stats():
     with WLOCK:
         ac, zn, qk = len(W_AIRCRAFT), list(W_ZONES), len(W_QUAKES)
     top = zn[0] if zn else None
+    buildup = w_military_buildup()
     return jsonify({"aircraft": ac, "zones_active": sum(1 for z in zn if z["threat"] >= 22),
                     "quakes": qk, "near": near[:12], "near_count": len(near),
+                    "buildup": buildup, "buildup_alert": [b for b in buildup if b["level"] == "INUSUAL"],
                     "top_zone": {"name": top["name"], "threat": top["threat"], "label": top["label"]} if top else None,
                     "status": WSTATUS, "uptime": int(time.time() - W_STARTED[0]),
                     "updated": datetime.now().strftime("%H:%M:%S")})
@@ -949,8 +1027,10 @@ def api_config():
     j = request.json or {}
     if "win_toast" in j: SETTINGS["win_toast"] = bool(j["win_toast"])
     if "llama_url" in j: SETTINGS["llama_url"] = str(j["llama_url"]).strip()
+    if "ais_key" in j: SETTINGS["ais_key"] = str(j["ais_key"]).strip()
     save_settings()
-    return jsonify({"win_toast": SETTINGS.get("win_toast", True), "llama_url": SETTINGS.get("llama_url", "")})
+    return jsonify({"win_toast": SETTINGS.get("win_toast", True), "llama_url": SETTINGS.get("llama_url", ""),
+                    "ais_key": bool(SETTINGS.get("ais_key"))})
 
 @app.post("/api/lang")
 def api_lang():

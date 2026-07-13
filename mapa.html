@@ -41,6 +41,26 @@ html,body{height:100%;font:14px/1.4 'Segoe UI',system-ui,sans-serif;background:v
 .nrow .cs{font-weight:700;font-variant-numeric:tabular-nums;min-width:58px}
 .nrow .z{margin-left:auto;color:var(--dim);font-size:11px}
 
+/* 🛩️ concentración militar (detector pre-ataque) */
+#buildbox{border:1px solid #4a3a10;border-radius:9px;padding:10px 12px;margin-bottom:14px;background:linear-gradient(135deg,#181204,#241a06)}
+#buildbox .th{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.brow{padding:7px 8px;border-radius:8px;margin-bottom:4px;cursor:pointer;background:rgba(0,0,0,.2)}
+.brow:hover{background:rgba(255,255,255,.05)}
+.brow.INUSUAL{border:1px solid var(--red);background:rgba(80,10,10,.35);animation:pulse 1.6s infinite}
+.brow .top{display:flex;align-items:center;gap:8px}
+.brow .zn{font-weight:700;font-size:13px}
+.brow .lv{margin-left:auto;font-size:9.5px;font-weight:800;letter-spacing:1px;padding:2px 7px;border-radius:4px}
+.brow .lv.INUSUAL{background:var(--red);color:#fff}.brow .lv.ELEVADA{background:var(--orange);color:#241303}.brow .lv.NORMAL{background:var(--line);color:var(--dim)}
+.brow .kinds{font-size:12px;color:var(--ivory);margin-top:4px}
+.brow .meta{font-size:10.5px;color:var(--dim);margin-top:2px}
+#milalert{display:none;position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:600;max-width:70%;
+  background:linear-gradient(90deg,#5a0d0d,#8a1414);border:1.5px solid var(--red);border-radius:9px;
+  padding:9px 18px;color:#fff;font-weight:700;font-size:13px;box-shadow:0 8px 30px rgba(255,0,0,.4);animation:pulse 1.3s infinite;cursor:pointer}
+#milalert b{color:#ffd23a}
+#mapctrl{position:absolute;left:12px;bottom:26px;z-index:600;display:flex;gap:6px;flex-wrap:wrap;max-width:60%}
+#mapctrl button{background:rgba(13,17,23,.9);border:1px solid var(--gold);color:var(--gold);border-radius:7px;padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer}
+#mapctrl button:hover{background:var(--gold);color:#07090c}
+
 /* zonas */
 .zrow{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;margin-bottom:3px}
 .zrow:hover{background:var(--panel2)}
@@ -68,6 +88,11 @@ html,body{height:100%;font:14px/1.4 'Segoe UI',system-ui,sans-serif;background:v
 .plane.hot svg path{fill:var(--red)}
 .plane.hot svg{filter:drop-shadow(0 0 7px var(--red));animation:planeblink 1s infinite}
 @keyframes planeblink{50%{opacity:.55}}
+.plane.notable svg{width:26px;height:26px}
+.plane.notable svg path{fill:var(--gold)}
+.plane.notable svg{filter:drop-shadow(0 0 6px var(--gold))}
+.plane.notable::after{content:'';position:absolute;top:50%;left:50%;width:30px;height:30px;margin:-15px 0 0 -15px;
+  border:1.5px solid var(--gold);border-radius:50%;opacity:.6;animation:ring 2s infinite}
 .zone-pulse{border-radius:50%;position:relative}
 .zone-pulse::before{content:'';position:absolute;inset:0;border-radius:50%;background:inherit;opacity:.5;animation:ring 1.8s infinite}
 @keyframes ring{0%{transform:scale(1);opacity:.6}100%{transform:scale(3.2);opacity:0}}
@@ -84,6 +109,37 @@ html,body{height:100%;font:14px/1.4 'Segoe UI',system-ui,sans-serif;background:v
 .blast .boom{font-size:26px;filter:drop-shadow(0 0 6px #ff5a1a);animation:boom 2.6s infinite}
 @keyframes boom{0%,55%{opacity:0;transform:translate(-50%,-50%) scale(.3)}66%{opacity:1;transform:translate(-50%,-50%) scale(1.35)}82%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
 .attack-tag{background:rgba(180,10,10,.92);color:#fff;font-size:9px;font-weight:800;letter-spacing:1px;padding:2px 6px;border-radius:4px;white-space:nowrap;top:-16px;box-shadow:0 0 8px rgba(255,0,0,.5)}
+
+/* 🎮 explosión estilo videojuego (one-shot) */
+.gexpl{width:130px;height:130px;position:relative;pointer-events:none}
+.gexpl>div{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.gexpl .flash{width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,#fff 0%,#ffe58a 40%,transparent 65%);animation:gflash .45s ease-out forwards}
+.gexpl .fire{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#fff,#ffb400 40%,#ff5a1a 70%,#ff3b3b 100%);box-shadow:0 0 20px 8px rgba(255,90,26,.7);animation:gfire .85s ease-out forwards}
+.gexpl .shock{width:8px;height:8px;border:3px solid #ffd23a;border-radius:50%;animation:gshock .8s ease-out forwards}
+.gexpl .smoke{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,rgba(70,70,70,.75),transparent 70%);animation:gsmoke 1.5s ease-out forwards}
+.gexpl .spark{width:5px;height:5px;border-radius:50%;background:#ffd23a;box-shadow:0 0 6px #ff8c1a;animation:gspark .8s ease-out forwards}
+@keyframes gflash{0%{opacity:1;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}}
+@keyframes gfire{0%{opacity:1;width:12px;height:12px}70%{opacity:.95}100%{opacity:0;width:90px;height:90px}}
+@keyframes gshock{0%{width:6px;height:6px;opacity:1}100%{width:120px;height:120px;opacity:0;border-color:#ff3b3b}}
+@keyframes gsmoke{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}30%{opacity:.75}100%{opacity:0;transform:translate(-50%,-90%) scale(2.2)}}
+@keyframes gspark{0%{opacity:1}100%{opacity:0}}
+
+/* 🚀 misil / tracer del avión atacando */
+.missile{width:14px;height:14px;position:relative}
+.missile .head{position:absolute;top:3px;left:3px;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle,#fff,#ffd23a);box-shadow:0 0 10px 4px rgba(255,140,0,.9)}
+.missile .trail{position:absolute;top:5px;right:8px;width:30px;height:3px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(255,140,26,.9))}
+
+/* 🪖 combate en zona */
+.fight{font-size:15px;filter:drop-shadow(0 0 5px #ff8c1a);animation:fightpulse .45s infinite alternate;white-space:nowrap}
+@keyframes fightpulse{from{transform:scale(.88)}to{transform:scale(1.18)}}
+
+/* 🎯 chokepoint Ormuz */
+.choke{color:var(--gold);font-size:20px;filter:drop-shadow(0 0 6px var(--gold));animation:fightpulse 1s infinite alternate}
+.choke-lbl{background:rgba(212,175,55,.9);color:#07090c;font-size:9px;font-weight:800;letter-spacing:1px;padding:2px 7px;border-radius:4px;white-space:nowrap;top:-14px}
+
+/* 🚢 barcos */
+.ship{color:#37d7ff;font-size:15px;filter:drop-shadow(0 0 3px rgba(55,215,255,.7))}
+.ship.stopped{color:#ff8c1a;filter:drop-shadow(0 0 4px #ff8c1a)}
 .leaflet-popup-content-wrapper{background:var(--panel);color:var(--ivory);border:1px solid var(--gold);border-radius:9px}
 .leaflet-popup-tip{background:var(--gold)}
 .leaflet-popup-content{margin:11px 13px;font-size:12.5px}
@@ -98,7 +154,14 @@ html,body{height:100%;font:14px/1.4 'Segoe UI',system-ui,sans-serif;background:v
 </head>
 <body>
 <div id="app">
-  <div id="map"></div>
+  <div id="map"><div id="milalert"></div>
+    <div id="mapctrl">
+      <button data-lat="20" data-lon="45" data-z="3">🌍 Mundo</button>
+      <button data-lat="26.57" data-lon="56.25" data-z="8">🎯 Estrecho de Ormuz</button>
+      <button data-lat="31.4" data-lon="34.4" data-z="8">🎯 Gaza</button>
+      <button data-lat="49.5" data-lon="31" data-z="6">🎯 Ucrania</button>
+    </div>
+  </div>
   <div id="side">
     <div id="head">
       <div class="t">ETG <b>WARMAP</b></div>
@@ -112,6 +175,10 @@ html,body{height:100%;font:14px/1.4 'Segoe UI',system-ui,sans-serif;background:v
       <div class="stat"><div class="n" id="s-quakes" style="color:var(--yellow)">—</div><div class="l">🌐 Sismos 24h</div></div>
     </div>
     <div id="body">
+      <div id="buildbox">
+        <div class="th">🛩️ DETECTOR PRE-ATAQUE · CONCENTRACIÓN MILITAR</div>
+        <div id="buildlist" style="font-size:12px;color:var(--dim)">Analizando movimiento aéreo militar…</div>
+      </div>
       <div id="nearbox" style="display:none">
         <div class="th">🎯 AERONAVES MILITARES SOBRE/CERCA DE ZONAS CALIENTES</div>
         <div id="nearlist"></div>
@@ -126,7 +193,9 @@ html,body{height:100%;font:14px/1.4 'Segoe UI',system-ui,sans-serif;background:v
           <div class="lay on" data-l="ac"><span class="dot" style="background:var(--cyan)"></span>Aeronaves militares<span class="cnt" id="c-ac">0</span><span class="sw"></span></div>
           <div class="lay on" data-l="zn"><span class="dot" style="background:var(--red)"></span>Zonas de conflicto<span class="cnt" id="c-zn">0</span><span class="sw"></span></div>
           <div class="lay on" data-l="qk"><span class="dot" style="background:var(--yellow)"></span>Sismos (M≥2.5)<span class="cnt" id="c-qk">0</span><span class="sw"></span></div>
+          <div class="lay on" data-l="sh"><span class="dot" style="background:#37d7ff"></span>Barcos · Ormuz (AIS)<span class="cnt" id="c-sh">0</span><span class="sw"></span></div>
         </div>
+        <div id="shipnote" style="font-size:10.5px;color:var(--dim);margin-top:7px"></div>
       </div>
     </div>
     <div id="foot">
@@ -141,35 +210,77 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
   attribution:'© OpenStreetMap · © CARTO · aviones adsb.lol · sismos USGS',subdomains:'abcd',maxZoom:18}).addTo(map);
 
 const L_ac=L.layerGroup().addTo(map), L_zn=L.layerGroup().addTo(map), L_qk=L.layerGroup().addTo(map);
-const on={ac:true,zn:true,qk:true};
+const L_fx=L.layerGroup().addTo(map), L_ship=L.layerGroup().addTo(map);
+const on={ac:true,zn:true,qk:true,sh:true};
+let ACS=[], ATTACK_ZONES=[];
 const threatColor=t=>t>=70?'#ff3b3b':t>=45?'#ff8c1a':t>=22?'#ffd23a':'#33d17a';
 const esc=t=>{const d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML};
 
 const PLANE_SVG='<svg viewBox="0 0 24 24" width="22" height="22"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16z"/></svg>';
 function planeIcon(a,hot){
   return L.divIcon({className:'',iconSize:[22,22],iconAnchor:[11,11],
-    html:`<div class="plane${hot?' hot':''}" style="transform:rotate(${(a.trk||0)}deg)">${PLANE_SVG}</div>`});
+    html:`<div class="plane${hot?' hot':''}${a.notable?' notable':''}" style="transform:rotate(${(a.trk||0)}deg)">${PLANE_SVG}</div>`});
 }
 function blastIcon(){
   return L.divIcon({className:'',iconSize:[90,90],iconAnchor:[45,45],
     html:'<div class="blast"><span class="ring"></span><span class="ring r2"></span><span class="ring r3"></span><span class="core"></span><span class="boom">💥</span></div>'});
 }
+/* 🎮 explosión one-shot estilo videojuego con chispas */
+function oneShotBlast(latlng){
+  let sparks='';
+  for(let k=0;k<8;k++){const a=k*45,d=34+Math.random()*20;
+    sparks+=`<div class="spark" style="animation-delay:${Math.random()*.1}s;transform:translate(-50%,-50%) translate(${Math.cos(a*Math.PI/180)*d}px,${Math.sin(a*Math.PI/180)*d}px)"></div>`;}
+  const ic=L.divIcon({className:'',iconSize:[130,130],iconAnchor:[65,65],
+    html:`<div class="gexpl"><div class="smoke"></div><div class="shock"></div>${sparks}<div class="fire"></div><div class="flash"></div></div>`});
+  const m=L.marker(latlng,{icon:ic,interactive:false,zIndexOffset:2000}).addTo(L_fx);
+  setTimeout(()=>L_fx.removeLayer(m),1500);
+}
+function missileIcon(angle){
+  return L.divIcon({className:'',iconSize:[14,14],iconAnchor:[7,7],
+    html:`<div class="missile" style="transform:rotate(${angle}deg)"><div class="trail"></div><div class="head"></div></div>`});
+}
+/* 🚀 avión atacando: proyectil que vuela hacia la zona y estalla */
+function launchAttackRun(from,to){
+  const dLat=to[0]-from[0], dLon=to[1]-from[1];
+  const ang=Math.atan2(-dLat,dLon)*180/Math.PI;
+  const m=L.marker(from,{icon:missileIcon(ang),interactive:false,zIndexOffset:1800}).addTo(L_fx);
+  let i=0;const steps=22;
+  const id=setInterval(()=>{i++;const t=i/steps;
+    m.setLatLng([from[0]+dLat*t, from[1]+dLon*t]);
+    if(i>=steps){clearInterval(id);L_fx.removeLayer(m);oneShotBlast(to);}
+  },40);
+}
+function pickOrigin(z){
+  // preferir un avión militar real cercano como origen del ataque
+  let best=null,bd=9;
+  ACS.forEach(a=>{const d=Math.hypot(a.lat-z.lat,a.lon-z.lon);if(d<bd&&d>0.4){bd=d;best=a;}});
+  if(best)return[best.lat,best.lon];
+  const ang=Math.random()*Math.PI*2, r=2+Math.random()*2;
+  return[z.lat+Math.sin(ang)*r, z.lon+Math.cos(ang)*r];
+}
+function attackTick(){
+  if(!on.zn||document.hidden)return;
+  ATTACK_ZONES.forEach(z=>{if(Math.random()<0.55)setTimeout(()=>launchAttackRun(pickOrigin(z),[z.lat,z.lon]),Math.random()*2500);});
+}
 let nearHexes=new Set();
 function drawAircraft(list){
+  ACS=list;
   L_ac.clearLayers();$('#c-ac').textContent=list.length;
   list.forEach(a=>{
     const hot=nearHexes.has(a.hex);
     const m=L.marker([a.lat,a.lon],{icon:planeIcon(a,hot),zIndexOffset:hot?1000:0});
     const altk=a.alt?(Math.round(a.alt/100)*100).toLocaleString()+' ft':'—';
     m.bindPopup(`<div class="pop"><h4>${a.flag} ${esc(a.call)}</h4>
-      <div class="pm">${esc(a.cty)} · ${esc(a.type)}${a.reg?' · '+esc(a.reg):''}</div>
+      <div class="pm">${a.notable?'<b style="color:var(--gold)">'+esc(a.klabel)+'</b> · ':''}${esc(a.cty)} · ${esc(a.type)}${a.reg?' · '+esc(a.reg):''}</div>
       Altitud: <b>${altk}</b><br>Velocidad: <b>${a.spd} kt</b> · Rumbo: <b>${Math.round(a.trk)}°</b>
+      ${a.notable?'<br><span style="color:var(--gold)">★ Multiplicador de fuerza</span>':''}
       ${hot?'<br><span class="sev2">⚠ Cerca de zona de conflicto</span>':''}</div>`);
     L_ac.addLayer(m);
   });
 }
 function drawZones(list){
   L_zn.clearLayers();$('#c-zn').textContent=list.length;
+  ATTACK_ZONES=list.filter(z=>z.attack).map(z=>({lat:z.lat,lon:z.lon}));
   list.forEach(z=>{
     const col=threatColor(z.threat), sz=14+Math.min(26,z.threat/3);
     const underAttack=!!z.attack;
@@ -177,6 +288,8 @@ function drawZones(list){
       L_zn.addLayer(L.marker([z.lat,z.lon],{icon:blastIcon(),interactive:false,zIndexOffset:-500}));
       L_zn.addLayer(L.marker([z.lat,z.lon],{icon:L.divIcon({className:'',iconSize:[0,0],
         html:`<span class="attack-tag" style="position:absolute;transform:translate(-50%,0)">⚠ BAJO ATAQUE</span>`}),interactive:false}));
+      L_zn.addLayer(L.marker([z.lat,z.lon],{icon:L.divIcon({className:'',iconSize:[0,0],
+        html:`<span class="fight" style="position:absolute;transform:translate(-50%,10px)">🪖⚔️💥🪖</span>`}),interactive:false,zIndexOffset:-400}));
     }
     const ic=L.divIcon({className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2],
       html:`<div class="zone-pulse" style="width:${sz}px;height:${sz}px;background:${col};border:2px solid #fff3"></div>`});
@@ -223,6 +336,24 @@ async function loadStats(){try{
       <span class="z">${esc(a.near)} · ${a.dist} km</span></div>`).join('');
     document.querySelectorAll('.nrow').forEach(r=>r.onclick=()=>map.flyTo([+r.dataset.lat,+r.dataset.lon],7,{duration:1.2}));
   }else nb.style.display='none';
+  /* 🛩️ concentración militar (detector pre-ataque) */
+  const bd=s.buildup||[];
+  if(bd.length){
+    $('#buildlist').innerHTML=bd.map(b=>{
+      const kinds=Object.entries(b.kinds||{}).map(([k,n])=>`${k}${n>1?' ×'+n:''}`).join(' · ');
+      return`<div class="brow ${b.level}" data-lat="${b.lat}" data-lon="${b.lon}">
+        <div class="top"><span class="zn">${esc(b.zone)}</span><span class="lv ${b.level}">${b.level}</span></div>
+        <div class="kinds">${b.notable?'★ '+esc(kinds):'<span style="color:var(--dim)">sin multiplicadores de fuerza</span>'}</div>
+        <div class="meta">${b.count} aeronaves militares en el área · índice ${b.score}</div></div>`;
+    }).join('');
+    document.querySelectorAll('.brow').forEach(r=>r.onclick=()=>map.flyTo([+r.dataset.lat,+r.dataset.lon],6,{duration:1.2}));
+  }else $('#buildlist').innerHTML='<span style="color:var(--dim)">Sin concentraciones militares detectadas ahora.</span>';
+  const al=s.buildup_alert||[];const mal=$('#milalert');
+  if(al.length){mal.style.display='block';const z=al[0];
+    const kinds=Object.entries(z.kinds||{}).map(([k,n])=>`${k}${n>1?' ×'+n:''}`).join(', ');
+    mal.innerHTML=`⚠️ ACTIVIDAD MILITAR INUSUAL sobre <b>${esc(z.zone)}</b>${kinds?' — '+esc(kinds):''} · posible operación`;
+    mal.onclick=()=>map.flyTo([z.lat,z.lon],6,{duration:1.2});
+  }else mal.style.display='none';
   const S=s.status||{};
   const fmt=(v)=>v&&v.startsWith('OK')?`<span class="ok">●</span>`:`<span class="bad">●</span>`;
   $('#st-adsb').innerHTML=`${fmt(S.adsb)} ✈ adsb.lol`;
@@ -233,18 +364,44 @@ async function loadStats(){try{
 
 document.querySelectorAll('.lay').forEach(l=>l.onclick=()=>{
   const k=l.dataset.l;on[k]=!on[k];l.classList.toggle('on',on[k]);
-  const g={ac:L_ac,zn:L_zn,qk:L_qk}[k];
+  const g={ac:L_ac,zn:L_zn,qk:L_qk,sh:L_ship}[k];
   if(on[k])g.addTo(map);else map.removeLayer(g);
 });
+/* controles de navegación rápida */
+document.querySelectorAll('#mapctrl button').forEach(b=>b.onclick=()=>map.flyTo([+b.dataset.lat,+b.dataset.lon],+b.dataset.z,{duration:1.4}));
+/* 🎯 marcador fijo del chokepoint de Ormuz */
+L.marker([26.57,56.25],{icon:L.divIcon({className:'',iconSize:[0,0],html:'<span class="choke" style="position:absolute;transform:translate(-50%,-50%)">🎯</span>'}),interactive:false}).addTo(map);
+L.marker([26.57,56.25],{icon:L.divIcon({className:'',iconSize:[0,0],html:'<span class="choke-lbl" style="position:absolute;transform:translate(-50%,0)">ESTRECHO DE ORMUZ</span>'}),interactive:false}).addTo(map);
+/* 🚢 barcos (AIS, requiere clave gratuita) */
+async function loadShips(){
+  try{
+    const d=await(await fetch('/api/ships')).json();
+    L_ship.clearLayers();
+    if(!d.ok){$('#c-sh').textContent='0';
+      $('#shipnote').innerHTML=`🚢 <b style="color:var(--gold)">Barcos en Ormuz:</b> ${esc(d.msg||'necesita clave AIS gratuita de aisstream.io')}`;return;}
+    $('#c-sh').textContent=d.ships.length;
+    $('#shipnote').innerHTML=`🚢 ${d.ships.length} barcos en el Estrecho de Ormuz · ${d.ships.filter(s=>s.stopped).length} detenidos`;
+    d.ships.forEach(s=>{
+      const ic=L.divIcon({className:'',iconSize:[16,16],iconAnchor:[8,8],
+        html:`<div class="ship${s.stopped?' stopped':''}" style="transform:rotate(${s.course||0}deg)">🚢</div>`});
+      const m=L.marker([s.lat,s.lon],{icon:ic});
+      m.bindPopup(`<div class="pop"><h4 style="color:#37d7ff">${esc(s.name||'Barco')}</h4>
+        <div class="pm">${esc(s.type||'')} · ${s.stopped?'<span style="color:var(--orange)">⚓ Detenido</span>':(s.speed||0)+' nudos'}</div></div>`);
+      L_ship.addLayer(m);
+    });
+  }catch(e){}
+}
 function clock(){$('#clock').textContent=new Date().toLocaleTimeString('es')}
 setInterval(clock,1000);
-loadStats();loadAircraft();loadZones();loadQuakes();
+loadStats();loadAircraft();loadZones();loadQuakes();loadShips();
 /* reintentos tempranos: las zonas/noticias tardan unos segundos en llegar al arrancar */
 [3000,8000,16000,28000].forEach(t=>setTimeout(()=>{loadZones();loadStats();loadQuakes();},t));
 setInterval(loadAircraft,15000);
 setInterval(loadStats,15000);
 setInterval(loadZones,45000);
 setInterval(loadQuakes,120000);
+setInterval(loadShips,20000);
+setInterval(attackTick,3500);   /* 🎮 oleadas de ataque animadas */
 </script>
 </body>
 </html>
