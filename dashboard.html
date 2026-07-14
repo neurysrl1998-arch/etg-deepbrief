@@ -14,61 +14,54 @@ body[data-theme="matrix"]{--bg:#030803;--panel:#071207;--panel2:#0a1a0a;--line:#
 body[data-theme="claro"]{--bg:#eee8da;--panel:#faf7ef;--panel2:#f0e9d8;--line:#d5cbb2;--gold:#8a6d1a;--gold2:#5f4a0c;--ivory:#2a2418;--dim:#79704f}
 body[data-theme="guerra"]{--bg:#0d0505;--panel:#160909;--panel2:#1e0c0c;--line:#3a1515;--gold:#ff5a45;--gold2:#ff8a6b;--ivory:#f5e6e0;--dim:#a07f78}
 
-/* ============ BARRA DE NAVEGACIÓN LATERAL ============ */
-#navbar{position:fixed;left:0;top:0;bottom:0;width:58px;background:var(--panel2);border-right:1px solid var(--line);
-  display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:3px;z-index:60;overflow-y:auto;transition:width .2s}
-#navbar::-webkit-scrollbar{width:0}
-#navlogo{width:36px;height:36px;border-radius:10px;background:var(--gold);color:var(--bg);display:flex;align-items:center;justify-content:center;
-  font-weight:800;font-family:Georgia,serif;font-size:18px;margin-bottom:10px;flex:none}
-.navitem{width:42px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;
-  color:var(--dim);cursor:pointer;flex:none;overflow:hidden;white-space:nowrap}
-.navitem:hover{background:var(--panel);color:var(--gold)}
-.navitem.act{background:var(--panel);color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)}
-.navitem .lbl{display:none;font-size:12.5px;font-weight:600}
-.navsep{flex:1}
-body{padding-left:58px}
-#statusbar{left:58px}
-/* nav con etiquetas (diseños Oro y Cards) */
-body[data-design="gold"],body[data-design="cards"]{padding-left:198px}
-body[data-design="gold"] #navbar,body[data-design="cards"] #navbar{width:198px;align-items:stretch;padding:12px 12px}
-body[data-design="gold"] #statusbar,body[data-design="cards"] #statusbar{left:198px}
-body[data-design="gold"] #navlogo,body[data-design="cards"] #navlogo{align-self:flex-start}
-body[data-design="gold"] .navitem,body[data-design="cards"] .navitem{width:auto;justify-content:flex-start;padding:0 12px;gap:12px;height:38px}
-body[data-design="gold"] .navitem .lbl,body[data-design="cards"] .navitem .lbl{display:inline}
+/* ============ MODO LIGERO (menos animaciones = menos CPU) ============ */
+body.lite::before{display:none!important}
+body.lite .item.hot{animation:none!important;background:var(--panel)!important}
+body.lite .item.CRITICO .lvl::after{animation:none!important;box-shadow:none!important}
+body.lite #ed-text .tw-cursor{display:none}
 
-/* ============ DISEÑOS — paleta + estilo completos (como en los mockups) ============ */
-/* 1 · Azul institucional */
-body[data-design="azul"]{--bg:#0a0e18;--panel:#0f1626;--panel2:#121c30;--line:#22304a;--gold:#3b82f6;--gold2:#6ea8ff;--ivory:#e8eef7;--dim:#7e8ba3}
-/* 2 · Claro */
-body[data-design="claro"]{--bg:#e9edf2;--panel:#ffffff;--panel2:#f2f5f9;--line:#d4dbe4;--gold:#16a34a;--gold2:#0f7a37;--ivory:#1b2431;--dim:#5f6d80}
-body[data-design="claro"] #masthead,body[data-design="claro"] #navbar{background:#fff}
-/* 3 · Púrpura neón */
-body[data-design="purple"]{--bg:#0c0a18;--panel:#14112a;--panel2:#1a1636;--line:#2f2857;--gold:#c084fc;--gold2:#e5c2ff;--ivory:#ece8f7;--dim:#8a80b0}
-body[data-design="purple"] .panel{box-shadow:0 0 20px -10px var(--gold)}
-body[data-design="purple"] .ph{text-transform:uppercase;letter-spacing:1.5px}
-/* 4 · Oro (nav con etiquetas) */
-body[data-design="gold"]{--bg:#0a0a08;--panel:#14110a;--panel2:#1a160d;--line:#2a2415;--gold:#d4af37;--gold2:#f0d067;--ivory:#f2ead8;--dim:#9a8f77}
-/* 5 · Verde matrix */
-body[data-design="green"]{--bg:#050f0a;--panel:#0a1a10;--panel2:#0c2114;--line:#173a24;--gold:#22c55e;--gold2:#5ff08a;--ivory:#dbf5e3;--dim:#5f8f68}
-/* 6 · Púrpura tarjetas (nav con etiquetas + cards redondeadas) */
-body[data-design="cards"]{--bg:#0e0a1e;--panel:#1a1230;--panel2:#221741;--line:#33265a;--gold:#8b7bff;--gold2:#b3a8ff;--ivory:#ece8f7;--dim:#8a80b0}
-body[data-design="cards"] .panel{border-radius:16px}
-body[data-design="cards"] #navlogo{border-radius:50%}
-body[data-design="cards"] .navitem{border-radius:22px}
-body[data-design="cards"] .item{border:1px solid var(--line);border-radius:14px;margin:6px 10px;background:var(--panel2)}
-body[data-design="cards"] .item .lvl{display:none}
+/* ============ DISEÑOS (estilo visual, combinable con el color) ============ */
+/* 🌆 Futurista Neón */
+body[data-design="neon"] .panel{border:1px solid var(--gold);border-radius:5px;box-shadow:0 0 16px -6px var(--gold);background:linear-gradient(155deg,var(--panel2),var(--bg))}
+body[data-design="neon"] .ph{text-transform:uppercase;letter-spacing:2.5px;border-bottom:1px solid var(--gold);text-shadow:0 0 7px var(--gold);background:transparent}
+body[data-design="neon"] #brand{text-shadow:0 0 12px var(--gold),0 0 26px var(--gold)}
+body[data-design="neon"] .badge,body[data-design="neon"] .nqbadge,body[data-design="neon"] .confchip{box-shadow:0 0 9px -2px currentColor}
+body[data-design="neon"] .item:hover{box-shadow:inset 3px 0 0 var(--gold)}
+body[data-design="neon"] .mbtn,body[data-design="neon"] .tab.act{box-shadow:0 0 10px -3px var(--gold)}
 
-/* ============ BADGE DE MINUTOS EN NOTICIAS ============ */
-.minbadge{flex:none;width:32px;text-align:center;font-family:'Consolas',monospace;line-height:1;padding-top:2px}
-.minbadge b{font-size:15px;font-weight:700;color:var(--gold2)}
-.minbadge span{display:block;font-size:8px;letter-spacing:1px;color:var(--dim);margin-top:1px}
+/* ⚪ Minimalista */
+body[data-design="minimal"] .panel{border:0.5px solid var(--line);border-radius:6px;box-shadow:none;background:transparent}
+body[data-design="minimal"] .ph{background:transparent;border-bottom:0.5px solid var(--line);font-family:'Segoe UI',sans-serif;font-weight:400;letter-spacing:.5px;font-size:12px;text-transform:uppercase;color:var(--dim)}
+body[data-design="minimal"] #brand{font-family:'Segoe UI',sans-serif;font-weight:300;letter-spacing:0}
+body[data-design="minimal"] #brand small{letter-spacing:2px}
+body[data-design="minimal"] .item{border-bottom:0.5px solid var(--line)} body[data-design="minimal"] .lvl{width:2px}
+body[data-design="minimal"] .item.hot{animation:none;background:transparent}
 
-/* ============ GRÁFICO VXN ============ */
-#vxnchart{width:100%;height:70px;margin:8px 0 4px;display:block}
+/* 💎 Cristal (glassmorphism) */
+body[data-design="cristal"] .panel{background:rgba(255,255,255,.055);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);border:1px solid rgba(255,255,255,.15);border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.35)}
+body[data-design="cristal"] .ph{background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.1)}
+body[data-design="cristal"] #masthead{backdrop-filter:blur(10px);background:rgba(255,255,255,.04)}
+body[data-design="cristal"] .item:hover{background:rgba(255,255,255,.07)}
+body[data-design="cristal"] .mbtn{background:rgba(255,255,255,.05);backdrop-filter:blur(8px)}
 
-/* ⚔️ Modo Guerra — solo un aro rojo de alerta, respeta el diseño elegido */
-body[data-war="1"] #app-frame,body[data-war="1"]{}
-body[data-war="1"] #masthead{box-shadow:inset 0 0 0 2px var(--red)}
+/* 🖥️ Terminal Retro (CRT) */
+body[data-design="terminal"]{font-family:'Consolas','Courier New',monospace}
+body[data-design="terminal"] .panel{border:1px solid var(--gold);border-radius:0;box-shadow:none;background:var(--bg)}
+body[data-design="terminal"] .ph{font-family:'Consolas',monospace;text-transform:uppercase;letter-spacing:1px;border-bottom:1px dashed var(--gold);background:transparent}
+body[data-design="terminal"] #brand,body[data-design="terminal"] .item .tt,body[data-design="terminal"] #ed-text{font-family:'Consolas',monospace}
+body[data-design="terminal"] #brand{text-shadow:0 0 6px var(--gold)}
+body[data-design="terminal"] .item{border-bottom:1px dashed var(--line)}
+body[data-design="terminal"]::after{content:'';position:fixed;inset:0;z-index:9998;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0px,rgba(0,0,0,.16) 1px,transparent 1px,transparent 3px)}
+
+/* 📐 Neo-brutalista */
+body[data-design="brutal"] .panel{border:2px solid var(--gold);border-radius:0;box-shadow:5px 5px 0 var(--gold)}
+body[data-design="brutal"] .ph{background:var(--gold);color:var(--bg);border:none;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+body[data-design="brutal"] .ph .grab,body[data-design="brutal"] .ph .r{color:var(--bg)}
+body[data-design="brutal"] #brand{letter-spacing:0;font-weight:800}
+body[data-design="brutal"] .badge,body[data-design="brutal"] .nqbadge{border-radius:0}
+body[data-design="brutal"] .item{border-bottom:2px solid var(--line)}
+body[data-design="brutal"] .mbtn,body[data-design="brutal"] .tab{border-radius:0;border-width:2px}
 
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ivory);font:14px/1.45 'Segoe UI',system-ui,sans-serif;overflow-x:hidden;transition:background .4s}
@@ -393,20 +386,6 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
 </head>
 <body>
 
-<nav id="navbar">
-  <div id="navlogo">E</div>
-  <div class="navitem act" data-nav="all" title="Portada">📰<span class="lbl">Portada</span></div>
-  <div class="navitem" data-nav="geo" title="Geopolítica">🌍<span class="lbl">Geopolítica</span></div>
-  <div class="navitem" data-nav="markets" title="Mercados">📈<span class="lbl">Mercados</span></div>
-  <div class="navitem" data-nav="energy" title="Energía">🛢️<span class="lbl">Energía</span></div>
-  <div class="navitem" data-nav="crypto" title="Cripto">₿<span class="lbl">Cripto</span></div>
-  <div class="navitem" data-nav="watch" title="Vigilancia">👁️<span class="lbl">Vigilancia</span></div>
-  <div class="navitem" data-nav="calendar" title="Calendario">📅<span class="lbl">Calendario</span></div>
-  <div class="navsep"></div>
-  <div class="navitem" data-nav="mapa" title="Mapa de guerra">🗺️<span class="lbl">Mapa</span></div>
-  <div class="navitem" data-nav="chat" title="Pregúntale al mercado">💬<span class="lbl">Chat IA</span></div>
-  <div class="navitem" data-nav="cfg" title="Configuración">⚙️<span class="lbl">Configuración</span></div>
-</nav>
 <div id="masthead">
   <div id="brand">ETG DEEPBRIEF<small>EL PERIÓDICO DEL TRADING · ELITE TRADING GROUP</small></div>
   <div id="mastdiv"></div>
@@ -494,7 +473,6 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
       <div class="ph"><span class="grab" title="Arrastra para mover">⠿</span>🌪️ VXN · VOLATILIDAD NASDAQ-100</div>
       <div id="volbox">
         <div id="volhead"><span id="vixval">—</span><span id="vixchg"></span><span id="volstate">…</span></div>
-        <svg id="vxnchart" viewBox="0 0 300 70" preserveAspectRatio="none"></svg>
         <div id="volmeter"><div id="volfill"></div></div>
         <div id="volscale"><span>10</span><span>20</span><span>25</span><span>32</span><span>45+</span></div>
         <div id="volnote">Esperando datos del VXN (CBOE Nasdaq-100)…</div>
@@ -564,14 +542,13 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
   <div id="cfg">
     <div class="ch">⚙️ Configuración <span class="x" id="cfgclose">✕</span></div>
     <div class="sec">
-      <div class="sl">DISEÑO VISUAL</div>
-      <div id="designs">
-        <div class="dsn" data-d="gold"><b>Oro</b><span>menú lateral · dorado</span></div>
-        <div class="dsn" data-d="azul"><b>Azul institucional</b><span>navy · pro</span></div>
-        <div class="dsn" data-d="claro"><b>Claro</b><span>diurno · verde</span></div>
-        <div class="dsn" data-d="purple"><b>Púrpura neón</b><span>violeta · glow</span></div>
-        <div class="dsn" data-d="green"><b>Verde matrix</b><span>terminal verde</span></div>
-        <div class="dsn" data-d="cards"><b>Púrpura tarjetas</b><span>cards · menú</span></div>
+      <div class="sl">TEMA DE COLORES</div>
+      <div id="themes">
+        <div class="thm" data-t=""><span class="sw" style="background:linear-gradient(90deg,#0a0a08 50%,#d4af37 50%)"></span>ETG Oro</div>
+        <div class="thm" data-t="azul"><span class="sw" style="background:linear-gradient(90deg,#060a12 50%,#4da3ff 50%)"></span>Terminal Azul</div>
+        <div class="thm" data-t="matrix"><span class="sw" style="background:linear-gradient(90deg,#030803 50%,#22cc55 50%)"></span>Matrix Verde</div>
+        <div class="thm" data-t="claro"><span class="sw" style="background:linear-gradient(90deg,#eee8da 50%,#8a6d1a 50%)"></span>Marfil Claro</div>
+        <div class="thm" data-t="guerra"><span class="sw" style="background:linear-gradient(90deg,#0d0505 50%,#ff5a45 50%)"></span>Rojo Guerra</div>
       </div>
     </div>
     <div class="sec">
@@ -581,6 +558,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;op
       <div class="optrow">🔔 Sonido en alertas críticas <span class="switch" id="swsnd"></span></div>
       <div class="optrow">🪟 Notificaciones de Windows (aunque cierres la ventana) <span class="switch" id="swwin"></span></div>
       <div class="optrow">⚔️ Modo Guerra automático (tensión ≥ 70) <span class="switch" id="swwar"></span></div>
+      <div class="optrow">⚡ Modo ligero (menos animaciones · menos CPU) <span class="switch" id="swlite"></span></div>
     </div>
     <div class="sec">
       <div class="sl">PANELES Y VISTAS</div>
@@ -635,6 +613,8 @@ let LANG=localStorage.getItem('etg_lang')||'en';
 let soundOn=localStorage.getItem('etg_snd')==='1';
 let toastOn=localStorage.getItem('etg_toast')!=='0';
 let breakOn=localStorage.getItem('etg_break')!=='0';
+let liteOn=localStorage.getItem('etg_lite')!=='0';
+document.body.classList.toggle('lite',liteOn);
 let warOn=localStorage.getItem('etg_war')!=='0';
 let winToast=true, warPrevTheme=null, alertsTimer=null;
 const speedNotified={};
@@ -649,30 +629,14 @@ function applyTheme(t,save=true){document.body.dataset.theme=t||'';if(save)local
 applyTheme(localStorage.getItem('etg_theme')||'');
 $$('.thm').forEach(x=>x.onclick=()=>applyTheme(x.dataset.t));
 
-/* ---------- diseño visual ---------- */
-function applyDesign(d,save=true){d=d||'gold';document.body.dataset.design=d;if(save)localStorage.setItem('etg_design',d);
-  $$('.dsn').forEach(x=>x.classList.toggle('act',x.dataset.d===d))}
-applyDesign(localStorage.getItem('etg_design')||'gold');
-$$('.dsn').forEach(x=>x.onclick=()=>applyDesign(x.dataset.d));
-
-/* ---------- barra de navegación lateral ---------- */
-$$('.navitem').forEach(n=>n.onclick=()=>{
-  const k=n.dataset.nav;
-  if(k==='cfg'){$('#cfgbtn').click();return;}
-  if(k==='mapa'){$('#mapbtn').click();return;}
-  if(k==='chat'){$('#chatbtn').click();return;}
-  if(k==='calendar'){document.querySelector('[data-pid="calendar"]')?.scrollIntoView({behavior:'smooth'});return;}
-  $$('.navitem').forEach(x=>x.classList.remove('act'));n.classList.add('act');
-  const tab=document.querySelector(`.tab[data-cat="${k}"]`);
-  if(tab){tab.click();document.querySelector('#p-stream')?.scrollIntoView({behavior:'smooth',block:'start'});}
-});
-
 /* ---------- configuración ---------- */
 $('#cfgbtn').onclick=()=>{$('#cfgwrap').style.display='block';syncSwitches()};
 $('#cfgclose').onclick=()=>$('#cfgwrap').style.display='none';
 $('#cfgwrap').onclick=e=>{if(e.target.id==='cfgwrap')$('#cfgwrap').style.display='none'};
 function syncSwitches(){$('#swtoast').classList.toggle('on',toastOn);$('#swbreak').classList.toggle('on',breakOn);
-  $('#swsnd').classList.toggle('on',soundOn);$('#swwin').classList.toggle('on',winToast);$('#swwar').classList.toggle('on',warOn)}
+  $('#swsnd').classList.toggle('on',soundOn);$('#swwin').classList.toggle('on',winToast);$('#swwar').classList.toggle('on',warOn);
+  $('#swlite').classList.toggle('on',liteOn)}
+$('#swlite').onclick=()=>{liteOn=!liteOn;localStorage.setItem('etg_lite',liteOn?'1':'0');document.body.classList.toggle('lite',liteOn);syncSwitches()};
 $('#swtoast').onclick=()=>{toastOn=!toastOn;localStorage.setItem('etg_toast',toastOn?'1':'0');syncSwitches()};
 $('#swbreak').onclick=()=>{breakOn=!breakOn;localStorage.setItem('etg_break',breakOn?'1':'0');syncSwitches()};
 $('#swsnd').onclick=()=>{soundOn=!soundOn;localStorage.setItem('etg_snd',soundOn?'1':'0');syncSwitches();syncSnd()};
@@ -834,14 +798,13 @@ async function checkAlerts(){
 /* ---------- stream (según filtro) ---------- */
 async function loadItems(){
   try{
-    const r=await fetch(`/api/items?cat=${CAT}&q=${encodeURIComponent(Q)}`);const data=await r.json();
+    const r=await fetch(`/api/items?cat=${CAT}&q=${encodeURIComponent(Q)}`);const data=(await r.json()).slice(0,70);
     const st=$('#stream');st.innerHTML='';
     data.forEach(i=>{
       const div=document.createElement('div');div.className='item'+(i.level==='CRITICO'?' CRITICO':'')+(isHot(i)?' hot':'');
       const conf=i.cluster>=4?`<span class="confchip">✅ CONFIRMADO ×${i.cluster}</span>`:(i.cluster>=2?`<span class="clchip">🔗 ${i.cluster} fuentes</span>`:'');
       const since=(i.since&&i.since.length)?`<div class="since">📸 Desde esta noticia: ${i.since.map(s=>`${s.sym} <b class="${s.pct>=0?'up':'dn'}">${s.pct>=0?'+':''}${s.pct.toFixed(2)}%</b>`).join(' · ')}</div>`:'';
-      const mn=Math.floor((Date.now()/1000-i.ts)/60);const mlabel=mn<60?mn:Math.floor(mn/60);const munit=mn<60?'MIN':'H';
-      div.innerHTML=`<div class="minbadge"><b>${mlabel}</b><span>${munit}</span></div><div class="lvl ${i.level}"></div><div class="tx">
+      div.innerHTML=`<div class="lvl ${i.level}"></div><div class="tx">
         <div class="tt"><a href="${esc(i.link)}" target="_blank">${esc(T(i))}</a></div>
         <div class="mt">${isHot(i)?'<span class="hotchip">🔥 CALIENTE</span>':''}<span class="badge ${i.level}">${i.level==='CRITICO'?'CRÍTICO':i.level}</span>
         ${conf}<span class="catchip" style="color:${CATC[i.cat]||'var(--gold)'}">${CATN[i.cat]||i.cat}</span>
@@ -888,13 +851,6 @@ function updateVol(vix){
   const vs=$('#volstate');vs.textContent=state;vs.style.background=color;vs.style.color='#0a0a08';
   const fill=$('#volfill');fill.style.width=Math.min(100,v*2.1)+'%';fill.style.background=color;
   fill.classList.toggle('hi',v>=30);
-  const sp=vix.spark;const svg=$('#vxnchart');
-  if(svg&&sp&&sp.length>4){
-    const mn=Math.min(...sp),mx=Math.max(...sp),rg=(mx-mn)||1;
-    const pts=sp.map((val,k)=>`${(k/(sp.length-1)*300).toFixed(1)},${(66-(val-mn)/rg*58).toFixed(1)}`);
-    const line=pts.join(' ');const area=`0,70 ${line} 300,70`;
-    svg.innerHTML=`<polygon points="${area}" fill="${color}" opacity="0.12"/><polyline points="${line}" fill="none" stroke="${color}" stroke-width="1.6" vector-effect="non-scaling-stroke"/>`;
-  }
   $('#volnote').textContent=note;
   const warn=v>=30||pct>=12;
   $('#volwarn').style.display=warn?'block':'none';
@@ -956,11 +912,12 @@ async function loadMeta(){
     $('#tdetail').textContent=`${t.criticos} críticos · ${t.altos} altos`;
     drawGauge('#tgauge',t.value,tc);
     /* ⚔️ MODO GUERRA automático */
-    const warActive=document.body.dataset.war==='1';
-    if(warOn&&t.value>=70&&!warActive){
-      document.body.dataset.war='1';$('#warbadge').style.display='block';setAlertsInterval(15000);
-    }else if(warActive&&(t.value<60||!warOn)){
-      document.body.dataset.war='';$('#warbadge').style.display='none';setAlertsInterval(30000);
+    if(warOn&&t.value>=70&&warPrevTheme===null){
+      warPrevTheme=localStorage.getItem('etg_theme')||'';
+      applyTheme('guerra',false);$('#warbadge').style.display='block';setAlertsInterval(15000);
+    }else if(warPrevTheme!==null&&(t.value<60||!warOn)){
+      applyTheme(warPrevTheme);warPrevTheme=null;
+      $('#warbadge').style.display='none';setAlertsInterval(30000);
     }
     winToast=m.win_toast!==false;
     if(m.fng.score!==null){const f=m.fng.score;const fc=f<=25?'var(--red)':f<=45?'var(--orange)':f<=55?'var(--yellow)':'var(--green)';
@@ -1051,6 +1008,7 @@ let twTimer=null, lastEd='';
 function renderEdParas(text){return esc(text).split(/\n{2,}|\n/).filter(Boolean).map(p=>`<p>${p}</p>`).join('')}
 function typeEditorial(text){
   clearInterval(twTimer);
+  if(liteOn){$('#ed-text').innerHTML=renderEdParas(text);return;}
   const el=$('#ed-text');el.innerHTML='<span id="tw-span"></span><span class="tw-cursor">&nbsp;</span>';
   const span=$('#tw-span');let i=0;const raw=text;
   twTimer=setInterval(()=>{

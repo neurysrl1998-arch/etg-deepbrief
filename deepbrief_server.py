@@ -32,7 +32,7 @@ POLL_META_SEC   = 300    # calendario + fear&greed
 MAX_ITEMS       = 900
 KEEP_HOURS      = 48
 
-APP_VERSION = "3.7.2"
+APP_VERSION = "3.8.0"
 GH_REPO     = "neurysrl1998-arch/etg-deepbrief"
 RAW_VERSION_URL = f"https://raw.githubusercontent.com/{GH_REPO}/main/version.json"
 
@@ -1182,15 +1182,44 @@ def open_browser():
             subprocess.Popen([exe, f"--app={url}", "--window-size=1600,950"]); return
     webbrowser.open(url)
 
+def run_flask():
+    app.run(host="127.0.0.1", port=PORT, debug=False, use_reloader=False, threaded=True)
+
+def open_desktop_window():
+    """Ventana de escritorio nativa con WebView2 (no Edge completo)."""
+    # menos procesos/RAM: un solo render, sin GPU dedicada, memoria acotada
+    os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"] = (
+        "--renderer-process-limit=1 --disable-gpu --disable-dev-shm-usage "
+        "--js-flags=--max-old-space-size=192")
+    import webview
+    time.sleep(1.2)
+    webview.create_window("ETG DeepBrief", f"http://127.0.0.1:{PORT}",
+                          width=1600, height=950, min_size=(1120, 700))
+    webview.start()
+
 if __name__ == "__main__":
-    threading.Thread(target=news_loop,     daemon=True).start()
-    threading.Thread(target=quotes_loop,   daemon=True).start()
-    threading.Thread(target=meta_loop,     daemon=True).start()
+    threading.Thread(target=news_loop,      daemon=True).start()
+    threading.Thread(target=quotes_loop,    daemon=True).start()
+    threading.Thread(target=meta_loop,      daemon=True).start()
     threading.Thread(target=translate_loop, daemon=True).start()
     threading.Thread(target=llama_loop,     daemon=True).start()
     threading.Thread(target=editorial_loop, daemon=True).start()
     threading.Thread(target=tray_icon,      daemon=True).start()
-    if "--no-browser" not in sys.argv:
-        threading.Thread(target=open_browser, daemon=True).start()
+    threading.Thread(target=run_flask,      daemon=True).start()
     print(f"ETG DEEPBRIEF corriendo en http://127.0.0.1:{PORT}")
-    app.run(host="127.0.0.1", port=PORT, debug=False, use_reloader=False)
+    if "--no-browser" in sys.argv:
+        try:
+            while True: time.sleep(3600)
+        except KeyboardInterrupt:
+            pass
+    else:
+        try:
+            open_desktop_window()   # ventana nativa; al cerrarla, sale la app
+        except Exception:
+            traceback.print_exc()
+            open_browser()          # respaldo: Edge en modo app
+            try:
+                while True: time.sleep(3600)
+            except KeyboardInterrupt:
+                pass
+        os._exit(0)

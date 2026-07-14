@@ -1,5 +1,5 @@
 {
-  "version": "3.7.2",
-  "notes": "🎨 REDISEÑO REAL: barra de navegación lateral, badges de minutos en las noticias, gráfico del VXN, y 6 diseños completos con paleta propia (Oro, Azul institucional, Claro, Púrpura neón, Verde matrix, Púrpura tarjetas). Elígelos en ⚙️ → Diseño visual.",
-  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.7.2/ETG-DeepBrief.exe"
+  "version": "3.8.0",
+  "notes": "🖥️ Ahora es un PROGRAMA DE ESCRITORIO real: ventana propia con WebView2 (ya no abre Edge completo).\n⚡ Modo ligero por defecto (menos animaciones = menos CPU) y menos noticias en pantalla = menos RAM.\n🧹 Diseño limpio restaurado (barra superior, sin la barra lateral duplicada). Colores y análisis institucional intactos.",
+  "exe_url": "https://github.com/neurysrl1998-arch/etg-deepbrief/releases/download/v3.8.0/ETG-DeepBrief.exe"
 }
