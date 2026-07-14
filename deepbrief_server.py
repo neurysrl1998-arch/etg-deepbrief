@@ -32,7 +32,7 @@ POLL_META_SEC   = 300    # calendario + fear&greed
 MAX_ITEMS       = 900
 KEEP_HOURS      = 48
 
-APP_VERSION = "3.7.1"
+APP_VERSION = "3.7.2"
 GH_REPO     = "neurysrl1998-arch/etg-deepbrief"
 RAW_VERSION_URL = f"https://raw.githubusercontent.com/{GH_REPO}/main/version.json"
 
